@@ -19,7 +19,7 @@ StarlingPunk is a framework built on top the Starling library designed to add st
 * Starling already does a ton of things right, sprite-sheet animation, events, dynamic resolutions
 * Tons of tools and extensions will already work, like sprite-manager and particles
 
-### Feature features:
+### Planned future releases:
 * Integration with the box2D physics library
 * Helper class for the Ogmo level editor (link)
 * Helper functions for sound effects
