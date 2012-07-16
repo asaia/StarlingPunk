@@ -21,6 +21,7 @@ package com.saia.starlingPunkExample.worlds
 	{
 		private var _enemySpawnTimer:Number;
 		private var _player:PlayerEntity;
+		private var _timer:Timer;
 		public function PlayWorld() 
 		{
 		}
@@ -35,9 +36,9 @@ package com.saia.starlingPunkExample.worlds
 			createBgFill();
 			
 			_enemySpawnTimer = 500;
-			var timer:Timer = new Timer(_enemySpawnTimer);
-			timer.addEventListener(TimerEvent.TIMER, onEnemySpawnTimer);
-			timer.start();
+			_timer = new Timer(_enemySpawnTimer);
+			_timer.addEventListener(TimerEvent.TIMER, onEnemySpawnTimer);
+			_timer.start();
 			
 			_player = new PlayerEntity();
 			add(_player);
@@ -57,6 +58,9 @@ package com.saia.starlingPunkExample.worlds
 		override public function end():void 
 		{
 			super.end();
+			_timer.addEventListener(TimerEvent.TIMER, onEnemySpawnTimer);
+			_timer.stop();
+			_timer = null;
 			removeAll();
 		}
 		
