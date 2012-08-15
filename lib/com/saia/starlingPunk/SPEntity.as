@@ -2,59 +2,117 @@ package com.saia.starlingPunk
 {
 	import flash.display.BitmapData;
 	import flash.display.Shape;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	import starling.display.Image;
 	import starling.display.Sprite;
 	import starling.textures.Texture;
+	
 	/**
 	 * Main game Entity class updated by World.
 	 * @author Andy Saia
 	 */
+	
 	public class SPEntity extends Sprite
 	{
 		private var _world:SPWorld;
 		private var _type:String;
 		private var _hitBounds:Rectangle;
+		private var _collidable:Boolean;
+		private var _layer:uint;
 		
-		public function SPEntity(x:Number = 0, y:Number = 0, type:String = "") 
+		// Collision information.
+		private const HITBOX:Mask = new Mask;
+		private var _mask:Mask;
+		internal var _class:Class;
+		
+		public function SPEntity(x:Number = 0, y:Number = 0, type:String = "", mask:Mask = null) 
 		{
+			this._layer = 1;
 			this.x = x;
 			this.y = y;
+			if (type == "")
+				type = getQualifiedClassName(this);
 			this._type = type;
+			_collidable = true;
+			
+			if (mask) this.mask = mask;
+			HITBOX.assignTo(this);
+			_class = Class(getDefinitionByName(getQualifiedClassName(this)));
 		}
 		
 		//----------
 		//  getters and setters
 		//----------
 		
-		public function get world():SPWorld 
-		{
-			return _world;
-		}
-		
+		/**
+		 * The World object this Entity has been added to.
+		 */
+		public function get world():SPWorld {	return _world; }
 		public function set world(value:SPWorld):void 
 		{
 			_world = value;
 		}
 		
-		public function get type():String 
-		{
-			return _type;
-		}
-		
+		/**
+		 * The collision type, used for collision checking.
+		 */
+		public function get type():String { return _type; }
 		public function set type(value:String):void 
 		{
+			if (world)
+				world.changeEntityTypeName(_type, value);
 			_type = value;
 		}
 		
-		public function get hitBounds():Rectangle 
-		{
-			return _hitBounds;
-		}
-		
+		/**
+		 * The rectange bounds of the entity used for rectangle collision detection
+		 */
+		public function get hitBounds():Rectangle { return _hitBounds; }
 		public function set hitBounds(value:Rectangle):void 
 		{
 			_hitBounds = value;
+		}
+		
+		/**
+		 * If the Entity should respond to collision checks.
+		 */
+		public function get collidable():Boolean { return _collidable; }
+		public function set collidable(value:Boolean):void 
+		{
+			_collidable = value;
+		}
+		
+		/**
+		 * An optional Mask component, used for specialized collision. If this is
+		 * not assigned, collision checks will use the Entity's hitbox by default.
+		 */
+		public function get mask():Mask { return _mask; }
+		public function set mask(value:Mask):void 
+		{	
+			if (_mask == value) return;
+			if (_mask) _mask.assignTo(null);
+			_mask = value;
+			if (value) _mask.assignTo(this);
+		}
+		
+		/**
+		 * The rendering layer of this Entity. Higher layers are rendered first.
+		 */
+		public function get layer():uint 
+		{ return _layer; }
+		public function set layer(value:uint):void 
+		{
+			var temp:uint = value
+			if (world && this.parent)
+			{
+				if (temp > world.numChildren)
+					temp = world.numChildren;
+				world.setChildIndex(this, temp);
+			}
+			_layer = value;
 		}
 		
 		//-------------------
@@ -70,20 +128,40 @@ package com.saia.starlingPunk
 		*/
 		public function collideWith(entity:SPEntity, x:Number, y:Number):SPEntity
 		{
-			var tempRect:Rectangle = this.getRect(x, y);
+			if (!_world || !this.collidable || !entity.collidable) return null;
+			
+			var oldPos:Point = new Point(this.x, this.y);
+			this.x = x;
+			this.y = y;
 			
 			var entityRect:Rectangle = entity.getRect(entity.x, entity.y);
-			
-			var rectIntersection:Rectangle = tempRect.intersection(entityRect);
-			
 			var hitEntity:SPEntity = null;
-			if (rectIntersection.width != 0 && rectIntersection.height != 0)
+			if (collideRect(entityRect, this.x, this.y))
 			{
-				hitEntity = entity;
+				if (!_mask)
+				{
+					if (!entity._mask || entity._mask.collide(HITBOX))
+					{
+						this.x = oldPos.x;
+						this.y = oldPos.y;
+						return entity;
+					}
+					this.x = oldPos.x;
+					this.y = oldPos.y;
+					return null;
+				}
+				if (_mask.collide(entity._mask ? entity._mask : entity.HITBOX))
+				{
+					this.x = oldPos.x;
+					this.y = oldPos.y;
+					return entity;
+				}
 			}
+			
+			this.x = oldPos.x;
+			this.y = oldPos.y;
 			return hitEntity;
 		}
-		
 		
 		/**
 		 * Checks for a collision against an Entity type.
@@ -92,7 +170,7 @@ package com.saia.starlingPunk
 		 * @param	y			Virtual y position to place this Entity.
 		 * @return	The first Entity collided with, or null if none were collided.
 		*/
-		public function collide(type:String, x:Number, y:Number):SPEntity
+		public function collide(type:String, xRef:Number, y:Number):SPEntity
 		{
 			if (!this.world) return null;
 			var entity:SPEntity;
@@ -107,11 +185,45 @@ package com.saia.starlingPunk
 			for (var i:int = 0; i < numEnities; i++) 
 			{
 				var currentEntity:SPEntity = allEnitiesOfType[i];
-				entity = this.collideWith(currentEntity, x, y);
+				entity = this.collideWith(currentEntity, xRef, y);
 				if (entity) 
 					return entity;
 			}
 			return entity;
+		}
+		
+		/**
+		 * Checks for collision against multiple Entity types.
+		 * @param	types		An Array or Vector of Entity types to check for.
+		 * @param	x			Virtual x position to place this Entity.
+		 * @param	y			Virtual y position to place this Entity.
+		 * @return	The first Entity collided with, or null if none were collided.
+		 */
+		public function collideTypes(types:Object, x:Number, y:Number):SPEntity
+		{
+			if (!_world) return null;
+			var entity:SPEntity;
+			for each (var type:String in types)
+			{
+				if ((entity = collide(type, x, y))) return entity;
+			}
+			return null;
+		}
+		
+		/**
+		 * collide Rectangle
+		 * @param	rect
+		 */
+		public function collideRect(rect:Rectangle, xOffset:Number, yOffset:Number):Boolean 
+		{
+			var tempRect:Rectangle = this.getRect(xOffset, yOffset);
+			var rectIntersection:Rectangle = tempRect.intersection(rect);
+			
+			if (rectIntersection.width != 0 && rectIntersection.height != 0)
+			{
+				return true;
+			}
+			return false;
 		}
 		
 		/**
@@ -125,8 +237,7 @@ package com.saia.starlingPunk
 			var rect:Rectangle = this.getBounds(this);
 			if (_hitBounds)
 				rect = _hitBounds;
-			else
-				rect = this.getBounds(this);
+				
 			rect.x = xOffset - this.pivotX;
 			rect.y = yOffset - this.pivotY;
 			return rect;
@@ -135,10 +246,10 @@ package com.saia.starlingPunk
 		/**
 		 * displays hitbox for debug purposes 
 		 */
-		public function showHitBox():void
+		public function showHitBox(x:Number, y:Number):void
 		{
 			var shape:Shape = new Shape();
-			var hitRect:Rectangle = getRect(this.x, this.y);
+			var hitRect:Rectangle = getRect(x, y);
 			shape.graphics.lineStyle(1, 0xFF0000);
 			shape.graphics.drawRect(0, 0, hitRect.width, hitRect.height);
 			
@@ -147,8 +258,8 @@ package com.saia.starlingPunk
 			bmpData.draw(shape, shape.transform.matrix, shape.transform.colorTransform);
 			var image:Image = new Image(Texture.fromBitmapData(bmpData));
 			addChild(image);
-			
-			
+			image.x = x - this.x;
+			image.y = y - this.y;
 		}
 		
 		/**
@@ -177,7 +288,6 @@ package com.saia.starlingPunk
 		//----------
 		//  abstract methods
 		//----------
-		
 		
 		/**
 		* Override this; called when Entity updates

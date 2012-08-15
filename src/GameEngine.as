@@ -2,7 +2,9 @@ package
 {
 	import com.saia.starlingPunk.SP;
 	import com.saia.starlingPunk.SPEngine;
-	import com.saia.starlingPunkExample.worlds.PlayWorld;
+	import com.saia.starlingPunkExamples.helpers.ExampleManager;
+	import com.saia.starlingPunkExamples.platformer.controllers.LevelController;
+	import com.saia.starlingPunkExamples.shipShooter.worlds.PlayWorld;
 	
 	/**
 	 * ...
@@ -22,8 +24,9 @@ package
 		override public function init():void 
 		{
 			super.init();
-			var world:PlayWorld = new PlayWorld();
-			SP.world = world;
+			
+			SP.world = LevelController.getCurrentLevel();
+			//SP.world = new PlayWorld();
 		}
 	}
 }

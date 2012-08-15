@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://texturepacker.com-->
+<!-- $TexturePacker:SmartUpdate:b9069a78e50a287ae55ab52a91ded826$ -->
+<TextureAtlas imagePath="textureAtlas.png">
+    <SubTexture name="Ship" x="36" y="36" width="40" height="16"/>
+    <SubTexture name="burger" x="2" y="36" width="32" height="24"/>
+    <SubTexture name="goal" x="70" y="2" width="28" height="32"/>
+    <SubTexture name="marioTile" x="36" y="2" width="32" height="32"/>
+    <SubTexture name="platformTile" x="2" y="2" width="32" height="32"/>
+</TextureAtlas>

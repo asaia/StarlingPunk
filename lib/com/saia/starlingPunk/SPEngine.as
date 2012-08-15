@@ -94,7 +94,6 @@ package com.saia.starlingPunk
 			init();
 			
 			// start game loop
-			//TODO: add enterframe event here
 			addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
@@ -114,7 +113,7 @@ package com.saia.starlingPunk
 			if (!SP._goto) return;
 			
 			SP._world.end();
-			removeChild(SP._world);
+			removeChild(SP._world, true);
 			SP._world.updateLists();
 			SP._world = SP._goto;
 			SP._goto = null;

@@ -81,6 +81,7 @@ package com.saia.starlingPunk
 		{
 			if (!entity.world) return;
 			_removeList.push(entity);
+			entity.world = null;
 		}
 		
 		/**
@@ -111,6 +112,27 @@ package com.saia.starlingPunk
 			return _allEntities[type];
 		}
 		
+		/**
+		 * this is called by the entity object when ever the type is changed. It will update the allEntites dictionary list
+		 * @param the old type of the entity
+		 * @param the new type of the entity
+		*/
+		public function changeEntityTypeName(oldType:String, newType:String):void
+		{
+			var group:Vector.<SPEntity> = getType(oldType);
+			delete _allEntities[oldType];
+			
+			var newGroup:Vector.<SPEntity> = getType(newType);
+			if (!newGroup)
+			{
+				_allEntities[newType] = group;
+			}
+			else
+			{
+				_allEntities[newType] = newGroup.concat(group);
+			}
+		}
+		
 		//----------
 		//  private methods
 		//----------
@@ -137,8 +159,7 @@ package com.saia.starlingPunk
 			{
 				entity = _removeList[0];
 				entity.removed();
-				removeChild(entity);
-				entity.world = null;
+				removeChild(entity, true);
 				removeFromObjectLookup(entity);
 				//removes items till none are left
 				_removeList.splice(0, 1);
@@ -153,7 +174,11 @@ package com.saia.starlingPunk
 			{
 				entity = _addList[0];
 				addEntityToLookUp(entity);
-				addChild(entity);
+				
+				var tempLayer:uint = entity.layer;
+				if (tempLayer > numChildren)
+					tempLayer = numChildren;
+				addChildAt(entity, tempLayer);
 				entity.added();
 				//removes items till none are left
 				_addList.splice(0, 1);

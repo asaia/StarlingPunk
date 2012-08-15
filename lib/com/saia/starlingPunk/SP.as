@@ -1,5 +1,7 @@
 package com.saia.starlingPunk
 {
+	import flash.geom.Point;
+	import flash.geom.Rectangle;
 	import starling.display.Stage;
 	
 	/**
@@ -10,7 +12,7 @@ package com.saia.starlingPunk
 		/**
 		 * The StarlingPunk version.
 		 */
-		public static const VERSION:String = "1.0";
+		public static const VERSION:String = "1.1";
 		
 		/**
 		 * Width of the game.
@@ -472,5 +474,11 @@ package com.saia.starlingPunk
 		// Global Flash objects.
 		/** @private */ public static var stage:Stage;
 		/** @private */ public static var engine:SPEngine;
+		
+		
+		// Global objects used for rendering, collision, etc.
+		/** @private */ public static var point:Point = new Point;
+		/** @private */ public static var point2:Point = new Point;
+		/** @private */ public static var rect:Rectangle = new Rectangle;
 	}
 }
