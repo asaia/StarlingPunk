@@ -12,7 +12,7 @@ StarlingPunk
  * added collideTypes method to entity class
  * misc bug fixes/performance improvements
 
-##Future release plans:
+###Future release plans:
  * Port Camera class
  * Extension for box2D Physics Library
  * Component based behavior system sorta like Unity3D
@@ -23,6 +23,8 @@ Check out the examples that come with StarlingPunk:
 http://andysaia.com/blog/starlingPunkTilemaps/starlingPunk-example.html
 
 ----------------------------------------------------------------
+
+###What is StarlingPunk:
 
 StarlingPunk is a framework built on top the Starling library designed to add structure and organization to your 2D game projects. It’s perfect for rapidly prototyping ideas and promotes code reuse between projects.  As you may have been able to tell from the name, StarlingPunk is heavily inspired by the popular FlashPunk framework, although its not a direct port.
 
