@@ -7,3 +7,7 @@ bin-release/
 .flexProperties
 .settings/
 .project
+/obj
+/obj
+/obj
+/obj
