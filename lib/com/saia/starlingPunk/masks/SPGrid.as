@@ -1,6 +1,6 @@
 ﻿package com.saia.starlingPunk.masks
 {
-	import com.saia.starlingPunk.Mask;
+	import com.saia.starlingPunk.SPMask;
 	import com.saia.starlingPunk.SP;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -11,7 +11,7 @@
 	 * Uses a hash grid to determine collision, faster than
 	 * using hundreds of Entities for tiled levels, etc.
 	 */
-	public class Grid extends Hitbox
+	public class SPGrid extends SPHitbox
 	{
 		/**
 		 * If x/y positions should be used instead of columns/rows.
@@ -27,7 +27,7 @@
 		 * @param	x				X offset of the grid.
 		 * @param	y				Y offset of the grid.
 		 */
-		public function Grid(width:uint, height:uint, tileWidth:uint, tileHeight:uint, x:int = 0, y:int = 0) 
+		public function SPGrid(width:uint, height:uint, tileWidth:uint, tileHeight:uint, x:int = 0, y:int = 0) 
 		{
 			// check for illegal grid size
 			if (!width || !height || !tileWidth || !tileHeight) throw new Error("Illegal Grid, sizes cannot be 0.");
@@ -43,9 +43,9 @@
 			_height = height;
 			
 			// set callback functions
-			_check[Mask] = collideMask;
-			_check[Hitbox] = collideHitbox;
-			_check[Pixelmask] = collidePixelmask;
+			_check[SPMask] = collideMask;
+			_check[SPHitbox] = collideHitbox;
+			_check[SPPixelmask] = collidePixelmask;
 		}
 		
 		/**
@@ -197,21 +197,22 @@
 		public function get data():BitmapData { return _data; }
 		
 		/** @private Collides against an Entity. */
-		private function collideMask(other:Mask):Boolean
+		private function collideMask(other:SPMask):Boolean
 		{
-			_rect.x = other.parent.x - other.parent.pivotX - parent.x + parent.pivotX;
-			_rect.y = other.parent.y - other.parent.pivotY - parent.y + parent.pivotY;
-			_point.x = int((_rect.x + other.parent.width - 1) / _tile.width) + 1;
-			_point.y = int((_rect.y + other.parent.height -1) / _tile.height) + 1;
+			_rect.x = other.parent.x - other.parent.pivotX - other.parent.originX - parent.x + parent.pivotX + parent.originX;
+			_rect.y = other.parent.y - other.parent.pivotY - other.parent.originY - parent.y + parent.pivotY + parent.originY;
+			_point.x = int((_rect.x + other.parent.hitWidth - 1) / _tile.width) + 1;
+			_point.y = int((_rect.y + other.parent.hitHeight -1) / _tile.height) + 1;
 			_rect.x = int(_rect.x / _tile.width);
 			_rect.y = int(_rect.y / _tile.height);
 			_rect.width = _point.x - _rect.x;
 			_rect.height = _point.y - _rect.y;
+			
 			return _data.hitTest(new Point(), 1, _rect);
 		}
 		
 		/** @private Collides against a Hitbox. */
-		private function collideHitbox(other:Hitbox):Boolean
+		private function collideHitbox(other:SPHitbox):Boolean
 		{
 			_rect.x = other.parent.x + other._x - parent.x - _x;
 			_rect.y = other.parent.y + other._y - parent.y - _y;
@@ -225,7 +226,7 @@
 		}
 		
 		/** @private Collides against a Pixelmask. */
-		private function collidePixelmask(other:Pixelmask):Boolean
+		private function collidePixelmask(other:SPPixelmask):Boolean
 		{
 			var x1:int = other.parent.x + other._x - parent.x - _x,
 				y1:int = other.parent.y + other._y - parent.y - _y,

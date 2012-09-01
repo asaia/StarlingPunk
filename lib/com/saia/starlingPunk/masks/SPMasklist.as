@@ -1,25 +1,25 @@
 ﻿package com.saia.starlingPunk.masks 
 {
-	import com.saia.starlingPunk.Mask;
+	import com.saia.starlingPunk.SPMask;
 	
 	/**
 	 * A Mask that can contain multiple Masks of one or various types.
 	 */
-	public class Masklist extends Hitbox
+	public class SPMasklist extends SPHitbox
 	{
 		/**
 		 * Constructor.
 		 * @param	...mask		Masks to add to the list.
 		 */
-		public function Masklist(...mask) 
+		public function SPMasklist(...mask) 
 		{
-			for each (var m:Mask in mask) add(m);
+			for each (var m:SPMask in mask) add(m);
 		}
 		
 		/** @private Collide against a mask. */
-		override public function collide(mask:Mask):Boolean 
+		override public function collide(mask:SPMask):Boolean 
 		{
-			for each (var m:Mask in _masks)
+			for each (var m:SPMask in _masks)
 			{
 				if (m.collide(mask)) return true;
 			}
@@ -27,11 +27,11 @@
 		}
 		
 		/** @private Collide against a Masklist. */
-		override protected function collideMasklist(other:Masklist):Boolean 
+		override protected function collideMasklist(other:SPMasklist):Boolean 
 		{
-			for each (var a:Mask in _masks)
+			for each (var a:SPMask in _masks)
 			{
-				for each (var b:Mask in other._masks)
+				for each (var b:SPMask in other._masks)
 				{
 					if (a.collide(b)) return true;
 				}
@@ -44,7 +44,7 @@
 		 * @param	mask		The Mask to add.
 		 * @return	The added Mask.
 		 */
-		public function add(mask:Mask):Mask
+		public function add(mask:SPMask):SPMask
 		{
 			_masks[_count ++] = mask;
 			mask.list = this;
@@ -57,11 +57,11 @@
 		 * @param	mask		The Mask to remove.
 		 * @return	The removed Mask.
 		 */
-		public function remove(mask:Mask):Mask
+		public function remove(mask:SPMask):SPMask
 		{
 			if (_masks.indexOf(mask) < 0) return mask;
 			_temp.length = 0;
-			for each (var m:Mask in _masks)
+			for each (var m:SPMask in _masks)
 			{
 				if (m == mask)
 				{
@@ -71,7 +71,7 @@
 				}
 				else _temp[_temp.length] = m;
 			}
-			var temp:Vector.<Mask> = _masks;
+			var temp:Vector.<SPMask> = _masks;
 			_masks = _temp;
 			_temp = temp;
 			return mask;
@@ -96,7 +96,7 @@
 				}
 				else _temp[_temp.length] = _masks[index];
 			}
-			var temp:Vector.<Mask> = _masks;
+			var temp:Vector.<SPMask> = _masks;
 			_masks = _temp;
 			_temp = temp;
 		}
@@ -106,7 +106,7 @@
 		 */
 		public function removeAll():void
 		{
-			for each (var m:Mask in _masks) m.list = null;
+			for each (var m:SPMask in _masks) m.list = null;
 			_masks.length = _temp.length = _count = 0;
 			update();
 		}
@@ -116,7 +116,7 @@
 		 * @param	index		The Mask index.
 		 * @return	The Mask at the index.
 		 */
-		public function getMask(index:uint = 0):Mask
+		public function getMask(index:uint = 0):SPMask
 		{
 			return _masks[index % _masks.length];
 		}
@@ -125,10 +125,10 @@
 		override protected function update():void 
 		{
 			// find bounds of the contained masks
-			var t:int, l:int, r:int, b:int, h:Hitbox, i:int = _count;
+			var t:int, l:int, r:int, b:int, h:SPHitbox, i:int = _count;
 			while (i --)
 			{
-				if ((h = _masks[i] as Hitbox))
+				if ((h = _masks[i] as SPHitbox))
 				{
 					if (h._x < l) l = h._x;
 					if (h._y < t) t = h._y;
@@ -151,8 +151,8 @@
 		public function get count():uint { return _count; }
 		
 		// List information.
-		/** @private */ private var _masks:Vector.<Mask> = new Vector.<Mask>;
-		/** @private */ private var _temp:Vector.<Mask> = new Vector.<Mask>;
+		/** @private */ private var _masks:Vector.<SPMask> = new Vector.<SPMask>;
+		/** @private */ private var _temp:Vector.<SPMask> = new Vector.<SPMask>;
 		/** @private */ private var _count:uint;
 	}
 }

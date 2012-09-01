@@ -15,7 +15,7 @@
 	/**
 	 * A canvas to which Tiles can be drawn for fast multiple tile rendering.
 	 */
-	public class Tilemap extends Image
+	public class SPTilemap extends Image
 	{
 		
 		private var _tileList:Vector.<Image>;
@@ -35,7 +35,7 @@
 		 * @param	tileWidth		Tile width.
 		 * @param	tileHeight		Tile height.
 		 */
-		public function Tilemap(width:uint, height:uint, tileWidth:uint, tileHeight:uint) 
+		public function SPTilemap(width:uint, height:uint, tileWidth:uint, tileHeight:uint) 
 		{
 			_tileList = new Vector.<Image>();
 			

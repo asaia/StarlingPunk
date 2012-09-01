@@ -3,7 +3,7 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 	import com.saia.starlingPunk.extensions.ogmopunk.OgmoLayer;
 	import com.saia.starlingPunk.extensions.ogmopunk.OgmoProject;
 	import com.saia.starlingPunk.extensions.ogmopunk.OgmoTileSet;
-	import com.saia.starlingPunk.graphics.Tilemap;
+	import com.saia.starlingPunk.graphics.SPTilemap;
 	import com.saia.starlingPunk.SPEntity;
 	/**
 	 * ...
@@ -22,7 +22,7 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 		{
 			var tileSet:OgmoTileSet = OgmoProject.tileSets[this.data.@tileset];
 			var e:SPEntity = new SPEntity(0, 0, tileSet.name);
-			var tilemap:Tilemap = new Tilemap(OgmoProject.levelDims.x, OgmoProject.levelDims.y, tileSet.tileSize.x, tileSet.tileSize.y)
+			var tilemap:SPTilemap = new SPTilemap(OgmoProject.levelDims.x, OgmoProject.levelDims.y, tileSet.tileSize.x, tileSet.tileSize.y)
 			if (!OgmoProject.tileSetImages) throw new Error("You must first call the createTilesFromTextureAtlas method in the OgmoProject class");
 			
 			//passes the image vector to the tile class

@@ -2,7 +2,7 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 {
 	import com.saia.starlingPunk.extensions.ogmopunk.OgmoLayer;
 	import com.saia.starlingPunk.extensions.ogmopunk.OgmoProject;
-	import com.saia.starlingPunk.masks.Grid;
+	import com.saia.starlingPunk.masks.SPGrid;
 	import com.saia.starlingPunk.SPEntity;
 	/**
 	 * ...
@@ -22,7 +22,7 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 			var e:SPEntity = new SPEntity(0, 0, name);
 			e.setHitWidth(OgmoProject.levelDims.x);
 			e.setHitHeight(OgmoProject.levelDims.y);
-			var grid:Grid = new Grid(OgmoProject.levelDims.x, OgmoProject.levelDims.y, grid.x, grid.y);
+			var grid:SPGrid = new SPGrid(OgmoProject.levelDims.x, OgmoProject.levelDims.y, grid.x, grid.y);
 			if (exportMode == "Bitstring")
 			{
 				grid.loadFromString(data.toString(), '', '\n');

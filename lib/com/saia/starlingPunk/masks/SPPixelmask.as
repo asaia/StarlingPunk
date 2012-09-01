@@ -1,7 +1,7 @@
 ﻿package com.saia.starlingPunk.masks
 {
 	import adobe.utils.CustomActions;
-	import com.saia.starlingPunk.Mask;
+	import com.saia.starlingPunk.SPMask;
 	import com.saia.starlingPunk.SP;
 	import flash.display.BitmapData;
 	import flash.geom.Point;
@@ -10,7 +10,7 @@
 	/**
 	 * A bitmap mask used for pixel-perfect collision. 
 	 */
-	public class Pixelmask extends Hitbox
+	public class SPPixelmask extends SPHitbox
 	{
 		/**
 		 * Alpha threshold of the bitmap used for collision.
@@ -23,7 +23,7 @@
 		 * @param	x			X offset of the mask.
 		 * @param	y			Y offset of the mask.
 		 */
-		public function Pixelmask(source:BitmapData, x:int = 0, y:int = 0)
+		public function SPPixelmask(source:BitmapData, x:int = 0, y:int = 0)
 		{
 			// fetch mask data
 			if (source is BitmapData) _data = source;
@@ -37,25 +37,25 @@
 			_y = y;
 			
 			// set callback functions
-			_check[Mask] = collideMask;
-			_check[Pixelmask] = collidePixelmask;
-			_check[Hitbox] = collideHitbox;
+			_check[SPMask] = collideMask;
+			_check[SPPixelmask] = collidePixelmask;
+			_check[SPHitbox] = collideHitbox;
 		}
 		
 		/** @private Collide against an Entity. */
-		private function collideMask(other:Mask):Boolean
+		private function collideMask(other:SPMask):Boolean
 		{
 			_point.x = parent.x + _x;
 			_point.y = parent.y + _y;
-			_rect.x = other.parent.x - other.parent.pivotX;
-			_rect.y = other.parent.y - other.parent.pivotY;
+			_rect.x = other.parent.x - other.parent.pivotX - other.parent.originX;
+			_rect.y = other.parent.y - other.parent.pivotY - other.parent.originY;
 			_rect.width = other.parent.width;
 			_rect.height = other.parent.height;
 			return _data.hitTest(_point, threshold, _rect);
 		}
 		
 		/** @private Collide against a Hitbox. */
-		private function collideHitbox(other:Hitbox):Boolean
+		private function collideHitbox(other:SPHitbox):Boolean
 		{
 			_point.x = parent.x + _x;
 			_point.y = parent.y + _y;
@@ -67,7 +67,7 @@
 		}
 		
 		/** @private Collide against a Pixelmask. */
-		private function collidePixelmask(other:Pixelmask):Boolean
+		private function collidePixelmask(other:SPPixelmask):Boolean
 		{
 			_point.x = parent.x + _x;
 			_point.y = parent.y + _y;

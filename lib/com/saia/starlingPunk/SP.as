@@ -12,7 +12,7 @@ package com.saia.starlingPunk
 		/**
 		 * The StarlingPunk version.
 		 */
-		public static const VERSION:String = "1.1";
+		public static const VERSION:String = "1.2";
 		
 		/**
 		 * Width of the game.

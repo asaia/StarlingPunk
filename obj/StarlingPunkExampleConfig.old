@@ -16,20 +16,20 @@
     </define>
     <define append="true">
       <name>CONFIG::timeStamp</name>
-      <value>'8/13/2012'</value>
+      <value>'9/1/2012'</value>
     </define>
     <verbose-stacktraces>true</verbose-stacktraces>
     <source-path append="true">
-      <path-element>D:\projects\myRepo\Flash Games\StarlingPunkExample\src</path-element>
-      <path-element>D:\projects\myRepo\Flash Games\StarlingPunkExample\lib</path-element>
+      <path-element>D:\projects\StarlingPunk-git\StarlingPunk\src</path-element>
+      <path-element>D:\projects\StarlingPunk-git\StarlingPunk\lib</path-element>
       <path-element>C:\Program Files (x86)\FlashDevelop\Library\AS3\classes</path-element>
     </source-path>
     <library-path append="true">
-      <path-element>D:\projects\myRepo\Flash Games\StarlingPunkExample\lib\starling.swc</path-element>
+      <path-element>D:\projects\StarlingPunk-git\StarlingPunk\lib\starling.swc</path-element>
     </library-path>
   </compiler>
   <file-specs>
-    <path-element>D:\projects\myRepo\Flash Games\StarlingPunkExample\src\Main.as</path-element>
+    <path-element>D:\projects\StarlingPunk-git\StarlingPunk\src\Main.as</path-element>
   </file-specs>
   <default-background-color>#FFFFFF</default-background-color>
   <default-frame-rate>60</default-frame-rate>

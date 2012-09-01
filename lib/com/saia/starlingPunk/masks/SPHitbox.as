@@ -1,13 +1,13 @@
 ﻿package com.saia.starlingPunk.masks 
 {
-	import com.saia.starlingPunk.Mask;
+	import com.saia.starlingPunk.SPMask;
 	
 	/**
 	 * Uses parent's hitbox to determine collision. This class is used
 	 * internally by FlashPunk, you don't need to use this class because
 	 * this is the default behaviour of Entities without a Mask object.
 	 */
-	public class Hitbox extends Mask
+	public class SPHitbox extends SPMask
 	{
 		/**
 		 * Constructor.
@@ -16,27 +16,27 @@
 		 * @param	x			X offset of the hitbox.
 		 * @param	y			Y offset of the hitbox.
 		 */
-		public function Hitbox(width:uint = 1, height:uint = 1, x:int = 0, y:int = 0) 
+		public function SPHitbox(width:uint = 1, height:uint = 1, x:int = 0, y:int = 0) 
 		{
 			_width = width;
 			_height = height;
 			_x = x;
 			_y = y;
-			_check[Mask] = collideMask;
-			_check[Hitbox] = collideHitbox;
+			_check[SPMask] = collideMask;
+			_check[SPHitbox] = collideHitbox;
 		}
 		
 		/** @private Collides against an Entity. */
-		private function collideMask(other:Mask):Boolean
+		private function collideMask(other:SPMask):Boolean
 		{
 			return parent.x + _x + _width > other.parent.x - other.parent.pivotX
 				&& parent.y + _y + _height > other.parent.y - other.parent.pivotY
-				&& parent.x + _x < other.parent.x - other.parent.pivotX + other.parent.width
-				&& parent.y + _y < other.parent.y - other.parent.pivotY + other.parent.height;
+				&& parent.x + _x < other.parent.x - other.parent.pivotX + other.parent.originX + other.parent.hitWidth
+				&& parent.y + _y < other.parent.y - other.parent.pivotY + other.parent.originY + other.parent.hitHeight;
 		}
 		
 		/** @private Collides against a Hitbox. */
-		private function collideHitbox(other:Hitbox):Boolean
+		private function collideHitbox(other:SPHitbox):Boolean
 		{
 			return parent.x + _x + _width > other.parent.x + other._x
 				&& parent.y + _y + _height > other.parent.y + other._y
@@ -96,8 +96,8 @@
 		override protected function update():void 
 		{
 			// update entity bounds
-			parent.pivotX = -_x;
-			parent.pivotY = -_y;
+			parent.originX = -_x;
+			parent.originY = -_y;
 			parent.width = _width;
 			parent.height = _height;
 			

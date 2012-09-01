@@ -1,6 +1,14 @@
 StarlingPunk
 ============
 
+###Update Version 1.2 Change Log
+ * fixed issues with entities hit box collision
+ * hit box size wasn't being factored in by pixelMask
+ * ported some more properties and methods for hit boxes from flashPunk
+ * changed class names to reflect StarlingPunks naming convention
+
+----------------------------------------------------------------
+
 ###Update Version 1.1 Change Log
  * Tilemap support
  * Ogmo editor intergration

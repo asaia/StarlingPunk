@@ -1,14 +1,10 @@
 package com.saia.starlingPunk 
 {
-	import flash.display.BitmapData;
-	import flash.display.Shape;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getDefinitionByName;
 	import flash.utils.getQualifiedClassName;
-	import starling.display.Image;
 	import starling.display.Sprite;
-	import starling.textures.Texture;
 	
 	/**
 	 * Main game Entity class updated by World.
@@ -22,21 +18,30 @@ package com.saia.starlingPunk
 		private var _hitBounds:Rectangle;
 		private var _collidable:Boolean;
 		private var _layer:uint;
+		private var _originX:Number;
+		private var _originY:Number;
+		private var _scrollX:Number;
+		private var _scrollY:Number;
 		
 		// Collision information.
-		private const HITBOX:Mask = new Mask;
-		private var _mask:Mask;
+		private const HITBOX:SPMask = new SPMask;
+		private var _mask:SPMask;
 		internal var _class:Class;
 		
-		public function SPEntity(x:Number = 0, y:Number = 0, type:String = "", mask:Mask = null) 
+		public function SPEntity(x:Number = 0, y:Number = 0, type:String = "", mask:SPMask = null) 
 		{
-			this._layer = 1;
+			_scrollX = 1;
+			_scrollY = 1;
+			_layer = 1;
+			_originX = 0;
+			_originY = 0;
+			_collidable = true;
+			
 			this.x = x;
 			this.y = y;
 			if (type == "")
 				type = getQualifiedClassName(this);
 			this._type = type;
-			_collidable = true;
 			
 			if (mask) this.mask = mask;
 			HITBOX.assignTo(this);
@@ -89,8 +94,8 @@ package com.saia.starlingPunk
 		 * An optional Mask component, used for specialized collision. If this is
 		 * not assigned, collision checks will use the Entity's hitbox by default.
 		 */
-		public function get mask():Mask { return _mask; }
-		public function set mask(value:Mask):void 
+		public function get mask():SPMask { return _mask; }
+		public function set mask(value:SPMask):void 
 		{	
 			if (_mask == value) return;
 			if (_mask) _mask.assignTo(null);
@@ -113,6 +118,90 @@ package com.saia.starlingPunk
 				world.setChildIndex(this, temp);
 			}
 			_layer = value;
+		}
+		
+				
+		/**
+		 * X scrollfactor, effects how much the camera offsets the drawn graphic.
+		 * Can be used for parallax effect, eg. Set to 0 to follow the camera,
+		 * 0.5 to move at half-speed of the camera, or 1 (default) to stay still.
+		 */
+		public function get scrollX():Number 
+		{
+			return _scrollX;
+		}
+		
+		public function set scrollX(value:Number):void 
+		{
+			_scrollX = value;
+		}
+		
+		/**
+		 * Y scrollfactor, effects how much the camera offsets the drawn graphic.
+		 * Can be used for parallax effect, eg. Set to 0 to follow the camera,
+		 * 0.5 to move at half-speed of the camera, or 1 (default) to stay still.
+		 */
+		public function get scrollY():Number 
+		{
+			return _scrollY;
+		}
+		
+		public function set scrollY(value:Number):void 
+		{
+			_scrollY = value;
+		}
+		
+				
+		/**
+		 * X origin of the Entity's hitbox.
+		 */
+		public function get originX():Number 
+		{
+			return _originX;
+		}
+		
+		public function set originX(value:Number):void 
+		{
+			_originX = value;
+		}
+		
+		/**
+		 * Y origin of the Entity's hitbox.
+		 */
+		public function get originY():Number 
+		{
+			return _originY;
+		}
+		
+		public function set originY(value:Number):void 
+		{
+			_originY = value;
+		}
+		
+		/**
+		 * returns the width of the entities hit box
+		 */
+		public function get hitWidth():Number 
+		{
+			return getRect(x, y).width;
+		}
+		
+		public function set hitWidth(value:Number):void 
+		{
+			setHitWidth(value);
+		}
+		
+		/**
+		 * returns the height of the entities hit box
+		 */
+		public function get hitHeight():Number 
+		{
+			return getRect(x, y).height;
+		}
+		
+		public function set hitHeight(value:Number):void 
+		{
+			setHitHeight(value);
 		}
 		
 		//-------------------
@@ -140,6 +229,7 @@ package com.saia.starlingPunk
 			{
 				if (!_mask)
 				{
+					//trace(!entity._mask);
 					if (!entity._mask || entity._mask.collide(HITBOX))
 					{
 						this.x = oldPos.x;
@@ -170,7 +260,7 @@ package com.saia.starlingPunk
 		 * @param	y			Virtual y position to place this Entity.
 		 * @return	The first Entity collided with, or null if none were collided.
 		*/
-		public function collide(type:String, xRef:Number, y:Number):SPEntity
+		public function collide(type:String, x:Number, y:Number):SPEntity
 		{
 			if (!this.world) return null;
 			var entity:SPEntity;
@@ -185,7 +275,7 @@ package com.saia.starlingPunk
 			for (var i:int = 0; i < numEnities; i++) 
 			{
 				var currentEntity:SPEntity = allEnitiesOfType[i];
-				entity = this.collideWith(currentEntity, xRef, y);
+				entity = this.collideWith(currentEntity, x, y);
 				if (entity) 
 					return entity;
 			}
@@ -217,13 +307,13 @@ package com.saia.starlingPunk
 		public function collideRect(rect:Rectangle, xOffset:Number, yOffset:Number):Boolean 
 		{
 			var tempRect:Rectangle = this.getRect(xOffset, yOffset);
+			var bool:Boolean = false;
 			var rectIntersection:Rectangle = tempRect.intersection(rect);
-			
 			if (rectIntersection.width != 0 && rectIntersection.height != 0)
 			{
-				return true;
+				bool = true;
 			}
-			return false;
+			return bool;
 		}
 		
 		/**
@@ -238,14 +328,52 @@ package com.saia.starlingPunk
 			if (_hitBounds)
 				rect = _hitBounds;
 				
-			rect.x = xOffset - this.pivotX;
-			rect.y = yOffset - this.pivotY;
+			rect.x = xOffset - pivotX - _originX;
+			rect.y = yOffset - pivotY - _originY;
 			return rect;
+		}
+		
+		/**
+		 * Sets the Entity's hitbox properties.
+		 * @param	width		Width of the hitbox.
+		 * @param	height		Height of the hitbox.
+		 * @param	originX		X origin of the hitbox.
+		 * @param	originY		Y origin of the hitbox.
+		 */
+		public function setHitbox(width:int = 0, height:int = 0, originX:int = 0, originY:int = 0):void
+		{
+			this.width = width;
+			this.height = height;
+			this.originX = originX;
+			this.originY = originY;
+		}
+		
+		/**
+		 * Sets the origin of the Entity.
+		 * @param	x		X origin.
+		 * @param	y		Y origin.
+		 */
+		public function setOrigin(x:int = 0, y:int = 0):void
+		{
+			originX = x;
+			originY = y;
+		}
+		
+		/**
+		 * Center's the Entity's origin (half width and height)
+		 */
+		public function centerOrigin():void
+		{
+			originX = (hitWidth / 2) - width / 2;
+			originY = (hitHeight / 2) - height / 2;
 		}
 		
 		/**
 		 * displays hitbox for debug purposes 
 		 */
+		/*
+		 * This method doesn't seem to reliably display the position of the entites hitbox so its been commented out until a better way to do this is figured out
+		 * 
 		public function showHitBox(x:Number, y:Number):void
 		{
 			var shape:Shape = new Shape();
@@ -261,6 +389,7 @@ package com.saia.starlingPunk
 			image.x = x - this.x;
 			image.y = y - this.y;
 		}
+		*/
 		
 		/**
 		 * sets the hit bounds width
