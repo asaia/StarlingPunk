@@ -1,10 +1,12 @@
 package com.saia.starlingPunkExamples.shipShooter.entities 
 {
-	import com.saia.starlingPunk.graphics.Tilemap;
-	import com.saia.starlingPunk.masks.Grid;
 	import com.saia.starlingPunk.SP;
 	import com.saia.starlingPunk.SPEntity;
+	import com.saia.starlingPunk.graphics.SPTilemap;
+	import com.saia.starlingPunk.masks.SPGrid;
+	
 	import flash.display.Bitmap;
+	
 	import starling.display.Image;
 	import starling.textures.Texture;
 	
@@ -14,7 +16,7 @@ package com.saia.starlingPunkExamples.shipShooter.entities
 	 */
 	public class LevelTiles extends SPEntity 
 	{
-		[Embed(source = "../../../../media/textures/tileset.png")]
+		[Embed(source = "media/textures/tileset.png")]
 		private static const TILESET:Class;
 		public function LevelTiles() 
 		{
@@ -28,7 +30,7 @@ package com.saia.starlingPunkExamples.shipShooter.entities
 			var bmp:Bitmap = new TILESET();
 			var texture:Texture = Texture.fromBitmap(bmp);
 			
-			var tiles:Tilemap = new Tilemap(SP.width, SP.height, 32, 32);
+			var tiles:SPTilemap = new SPTilemap(SP.width, SP.height, 32, 32);
 			tiles.createTilesFromBitmapData(bmp.bitmapData);
 			
 			
@@ -39,7 +41,7 @@ package com.saia.starlingPunkExamples.shipShooter.entities
 			
 			addChild(tiles);
 			
-			var grid:Grid = new Grid(SP.width, SP.height, 32, 32, 0, 0);
+			var grid:SPGrid = new SPGrid(SP.width, SP.height, 32, 32, 0, 0);
 			mask = grid;
 			
 			grid.setRect(4, 4, 3, 5, true);

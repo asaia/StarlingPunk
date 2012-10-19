@@ -1,9 +1,11 @@
 package com.saia.starlingPunkExamples.shipShooter.entities 
 {
-	import com.saia.starlingPunk.masks.Pixelmask;
 	import com.saia.starlingPunk.SP;
 	import com.saia.starlingPunk.SPEntity;
+	import com.saia.starlingPunk.masks.SPPixelmask;
+	
 	import flash.display.Bitmap;
+	
 	import starling.display.Image;
 	import starling.textures.Texture;
 	
@@ -13,7 +15,7 @@ package com.saia.starlingPunkExamples.shipShooter.entities
 	 */
 	public class TestShape extends SPEntity 
 	{
-		[Embed(source = "../../../../media/textures/TestShape.png")]
+		[Embed(source = "media/textures/TestShape.png")]
 		private static const BMP_SHAPE:Class;
 		
 		public function TestShape() 
@@ -29,7 +31,7 @@ package com.saia.starlingPunkExamples.shipShooter.entities
 			var image:Image = new Image(Texture.fromBitmap(bitmap));
 			addChild(image);
 			
-			mask = new Pixelmask(bitmap.bitmapData);
+			mask = new SPPixelmask(bitmap.bitmapData);
 		}
 		
 	}
