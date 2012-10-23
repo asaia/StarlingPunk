@@ -26,6 +26,7 @@ package com.saia.starlingPunkExamples.platformer.entities
 		
 		private var _vel:Point;
 		private var _isJumpReleased:Boolean;
+		private var _isCameraEnabled:Boolean
 		
 		public function PlatformerPlayer() 
 		{
@@ -42,11 +43,12 @@ package com.saia.starlingPunkExamples.platformer.entities
 			setupGraphic();
 			_vel = new Point();
 			_isJumpReleased = true;
+			_isCameraEnabled = false;
 			
 			//define input
-			SPInput.define("right", [Key.RIGHT, Key.D]);
-			SPInput.define("left", [Key.LEFT, Key.A]);
-			SPInput.define("jump", [Key.UP, Key.W]);
+			SPInput.define("right", [Key.RIGHT]);
+			SPInput.define("left", [Key.LEFT]);
+			SPInput.define("jump", [Key.UP]);
 		}
 		
 		override public function removed():void 
@@ -61,6 +63,17 @@ package com.saia.starlingPunkExamples.platformer.entities
 			updateMovement();
 			updateInput();
 			updateCollision();
+			
+			updateCamera();
+			
+			//press spacebar to enable the camera
+			if (SPInput.pressed(Key.SPACE))
+			{
+				if (_isCameraEnabled)
+					disableCamera();
+				else
+					enableCamera();
+			}
 		}
 		
 		//-------------------
@@ -119,6 +132,8 @@ package com.saia.starlingPunkExamples.platformer.entities
 				if (!collide("collision", x + SP.sign(_vel.x), y)) 
 				{
 					x += SP.sign(_vel.x); 
+					if (_isCameraEnabled)
+						SP.camera.x += SP.sign(_vel.x);
 				} else 
 				{
 					_vel.x = 0; 
@@ -130,7 +145,9 @@ package com.saia.starlingPunkExamples.platformer.entities
 			{
 				if (!collide("collision", x, y + (SP.sign(_vel.y)))) 
 				{
-					y += SP.sign(_vel.y); 
+					y += SP.sign(_vel.y);
+					if (_isCameraEnabled)
+						SP.camera.y += SP.sign(_vel.y);
 				} else 
 				{
 					_vel.y = 0;
@@ -159,6 +176,35 @@ package com.saia.starlingPunkExamples.platformer.entities
 			addChild(image);
 		}
 		
+		private function updateCamera():void 
+		{
+			if (!_isCameraEnabled) return;
+			
+			SP.camera.focus(this.x, this.y);
+			
+			if (SPInput.check(Key.W))
+				SP.camera.zoom += 0.01;
+			else if (SPInput.check(Key.S))
+				SP.camera.zoom -= 0.01;
+				
+			if (SPInput.check(Key.A))
+				SP.camera.rotation -= 0.01;
+			else if (SPInput.check(Key.D))
+				SP.camera.rotation += 0.01;
+		}
+		
+		private function enableCamera():void
+		{
+			_isCameraEnabled = true;
+			SP.camera.x = this.x - 300;
+			SP.camera.y = this.y - 300;
+		}
+		
+		private function disableCamera():void
+		{
+			_isCameraEnabled = false;
+			SP.camera.reset();
+		}
 	}
 
 }

@@ -2,28 +2,27 @@
 {
 	import com.saia.starlingPunk.SP;
 	import flash.display.BitmapData;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
-	import starling.core.Starling;
 	import starling.display.BlendMode;
 	import starling.display.Image;
+	import starling.display.Sprite;
 	import starling.events.Event;
-	import starling.textures.RenderTexture;
 	import starling.textures.Texture;
 	import starling.textures.TextureAtlas;
 	
 	/**
 	 * A canvas to which Tiles can be drawn for fast multiple tile rendering.
 	 */
-	public class SPTilemap extends Image
+	public class SPTilemap extends Sprite
 	{
 		
-		private var _tileList:Vector.<Image>;
+		private var _tileList:Vector.<Texture>;
 		private var _width:Number;
 		private var _height:Number;
 		private var _maxWidth:Number;
 		private var _maxHeight:Number;
-		private var _renderTexture:RenderTexture;
 		
 		private var _allTileData:Vector.<Vector.<int>>;
 		
@@ -37,25 +36,27 @@
 		 */
 		public function SPTilemap(width:uint, height:uint, tileWidth:uint, tileHeight:uint) 
 		{
-			_tileList = new Vector.<Image>();
+			_tileList = new Vector.<Texture>();
 			
 			// set some tilemap information
 			_width = width - (width % tileWidth) + tileWidth;
 			_height = height - (height % tileHeight) + tileHeight;
 			_columns = _width / tileWidth;
 			_rows = _height / tileHeight;
-			_tile = new Rectangle(0, 0, tileWidth, tileHeight);
 			
-			// create the canvas
-			_maxWidth -= _maxWidth % tileWidth;
-			_maxHeight -= _maxHeight % tileHeight;
-			
-			_renderTexture = new RenderTexture(_width + tileWidth, _height + tileHeight);
-			super(_renderTexture);
+			_tileWidth = tileWidth;
+			_tileHeight = tileHeight;
 			
 			_setColumns = uint(width / tileWidth) + tileWidth;
 			_setRows = uint(height / tileHeight) + tileHeight;
 			_setCount = _setColumns * _setRows;
+			
+			// create the canvas
+			_maxWidth = _setColumns * tileWidth;
+			_maxHeight = _setRows * tileHeight;
+			
+			_spriteCanvas = new SpriteCanvas(this, _maxWidth, _maxHeight);
+			
 			
 			//init all tile data
 			_allTileData = new Vector.<Vector.<int>>(_setColumns, true);
@@ -70,7 +71,9 @@
 			}
 			
 			this.addEventListener(Event.REMOVED_FROM_STAGE, removed);
-			Starling.current.addEventListener(Event.CONTEXT3D_CREATE, onContextCreated);
+			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			
+			this.blendMode = BlendMode.NONE;
 		}
 		
 		/**
@@ -91,8 +94,8 @@
 					tilePixels = bitmapData.getPixels(rect);
 					tilePixels.position = 0;
 					tempData.setPixels(tempData.rect, tilePixels);
-					var tileImage:Image = new Image(Texture.fromBitmapData(tempData));
-					_tileList.push(tileImage);
+					
+					_tileList.push(Texture.fromBitmapData(tempData));
 				}
 			}
 		}
@@ -108,8 +111,7 @@
 			for (var i:int = 0; i < numTiles; i++) 
 			{
 				var texture:Texture = data.getTexture(tileNames[i]);
-				var image:Image = new Image(texture);
-				_tileList.push(image);
+				_tileList.push(texture);
 			}
 		}
 		
@@ -119,7 +121,13 @@
 		 */
 		public function createTilesFromVector(tiles:Vector.<Image>):void
 		{
-			_tileList = tiles;
+			var allTextures:Vector.<Texture> = new Vector.<Texture>();
+			for (var i:int = 0; i < tiles.length; i++) 
+			{
+				var tex:Texture = tiles[i].texture;
+				allTextures.push(tex);
+			}
+			_tileList = allTextures;
 		}
 		
 		/**
@@ -127,19 +135,27 @@
 		 * @param	column		Tile column.
 		 * @param	row			Tile row.
 		 * @param	index		Tile index.
+		 * @param   refress sprite calles that sprite's flatten method after tile is added to it
 		 */
-		public function setTile(column:uint, row:uint, index:uint = 0):void
+		public function setTile(column:uint, row:uint, index:uint = 0, refressSprite:Boolean = false):void
 		{
 			if (!_tileList.length) 
 			{
-				trace("ERROR: you need to call a createTiles method first");
+				throw new Error("You need to call one of the createTiles methods in order to use SPTilemaps");
 				return;
 			}
 			
-			var image:Image = _tileList[index];
-			image.x = column * _tile.width;
-			image.y = row * _tile.height;
-			_renderTexture.draw(image);
+			var sprite:Sprite = _spriteCanvas.getSpriteTile(column * _tileWidth, row * _tileHeight);
+			var image:Image = new Image(_tileList[index]);
+			
+			image.x = (column * _tileWidth) % SP.width;
+			image.y = (row * _tileHeight) % SP.height;
+			
+			image.blendMode = BlendMode.NONE;
+			sprite.addChild(image);
+			
+			if (refressSprite)
+				sprite.flatten();
 			
 			_allTileData[column][row] = index;
 		}
@@ -148,17 +164,20 @@
 		 * Clears the tile at the position.
 		 * @param	column		Tile column.
 		 * @param	row			Tile row.
+		 * @param   updateAfter Whether or not the sprite should be reflattend after the image is removed
+		 * @param   refress sprite calles that sprite's flatten method after tile is added to it
 		 */
-		public function clearTile(column:uint, row:uint):void
+		public function clearTile(column:uint, row:uint, refressSprite:Boolean = false):void
 		{
-			var image:Image = _tileList[0];
-			image.blendMode = BlendMode.ERASE;
-			image.x = column * _tile.width;
-			image.y = row * _tile.height;
-			_renderTexture.draw(image);
-			image.blendMode = BlendMode.NORMAL;
+			var sprite:Sprite = _spriteCanvas.getSpriteTile(column * _tileWidth, row * _tileHeight);
+			var imageX:Number = (column * _tileWidth) % SP.width;
+			var imageY:Number = (row * _tileHeight) % SP.height;
 			
-			_allTileData[column][row] = -1;
+			var image:Image = sprite.hitTest(new Point(imageX, imageY)) as Image;
+			image.removeFromParent();
+			
+			if (refressSprite)
+				sprite.flatten();
 		}
 		
 		/**
@@ -189,18 +208,16 @@
 				b:uint = row + height;
 			while (row < b)
 			{
-				_renderTexture.drawBundled(function():void
+				while (column < r)
 				{
-					while (column < r)
-					{
-						
-						setTile(column, row, index);
-						column ++;
-					}
-				});
+					setTile(column, row, index, false);
+					column ++;
+				}
 				column = c;
 				row ++;
 			}
+			
+			_spriteCanvas.flattenSpriteTiles();
 		}
 		
 		/**
@@ -219,17 +236,16 @@
 				b:uint = row + height;
 			while (row < b)
 			{
-				_renderTexture.drawBundled(function():void
+				while (column < r)
 				{
-					while (column < r)
-					{
-						clearTile(column, row);
-						column ++;
-					}
-					column = c;
-					row ++;
-				});
+					clearTile(column, row, false);
+					column ++;
+				}
+				column = c;
+				row ++;
 			}
+			
+			_spriteCanvas.flattenSpriteTiles();
 		}
 		
 		/**
@@ -249,15 +265,15 @@
 				col = row[y].split(columnSep),
 				cols = col.length;
 				
-				_renderTexture.drawBundled(function():void
+				for (x = 0; x < cols; x ++)
 				{
-					for (x = 0; x < cols; x ++)
-					{
-						if (col[x] == '') continue;
-						setTile(x, y, uint(col[x]));
-					}
-				});
+					if (col[x] == '') continue;
+					setTile(x, y, uint(col[x]));
+				}
+
 			}
+			
+			_spriteCanvas.flattenSpriteTiles();
 		}
 		
 		/**
@@ -302,29 +318,28 @@
 		//  event handlers
 		//-------------------
 		
+		private function onEnterFrame(e:Event):void
+		{
+			_spriteCanvas.update();
+		}
+		
+		
 		private function removed(e:Event):void 
 		{
 			removeEventListener(Event.REMOVED_FROM_STAGE, removed);
-			_renderTexture.dispose();
+			
 			while (_tileList.length)
 			{
-				var img:Image = _tileList[0];
-				img.dispose();
+				var texture:Texture = _tileList[0];
+				texture.dispose();
 				_tileList.splice(0, 1);
 			}
 			
+			_spriteCanvas.destroy();
+			removeChildren(0, -1, true);
 			removeFromParent(true);
 			_allTileData = null;
 			removeEventListeners();
-		}
-		
-		/**
-		 * this reloads the render texture if the device context is lost
-		 */
-		private function onContextCreated(e:Event):void 
-		{
-			var str:String = saveToString();
-			loadFromString(str);
 		}
 		
 		//-------------------
@@ -334,12 +349,12 @@
 		/**
 		 * The tile width.
 		 */
-		public function get tileWidth():uint { return _tile.width; }
+		public function get tileWidth():uint { return _tileWidth; }
 		
 		/**
 		 * The tile height.
 		 */
-		public function get tileHeight():uint { return _tile.height; }
+		public function get tileHeight():uint { return _tileHeight; }
 		
 		/**
 		 * How many columns the tilemap has.
@@ -359,9 +374,11 @@
 		/** @private */ private var _setColumns:uint;
 		/** @private */ private var _setRows:uint;
 		/** @private */ private var _setCount:uint;
-		/** @private */ private var _tile:Rectangle;
+		/** @private */ private var _tileWidth:uint;
+		/** @private */ private var _tileHeight:uint;
 		
 		// Global objects.
 		/** @private */ private var _rect:Rectangle = SP.rect;
+		private var _spriteCanvas:SpriteCanvas;
 	}
 }

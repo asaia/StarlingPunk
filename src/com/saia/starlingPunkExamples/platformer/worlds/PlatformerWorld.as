@@ -35,7 +35,7 @@ package com.saia.starlingPunkExamples.platformer.worlds
 			OgmoProject.createTileSetListFromTextureAtlas("groundTileSet", textureAtlas, ["platformTile", "marioTile"]);
 			
 			//display example instructions
-			ExampleManager.displayText();
+			ExampleManager.displayText('\ntoggle camera mode by pressing the "space bar"\nzoom in/out using "W/S" and rotate camera using "A/S"');
 			super.begin();
 		}
 		
@@ -65,7 +65,5 @@ package com.saia.starlingPunkExamples.platformer.worlds
 				add(entity);
 			}
 		}
-		
 	}
-
 }

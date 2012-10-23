@@ -1,6 +1,17 @@
 StarlingPunk
 ============
 
+###Update Version 1.3 Change Log
+ * created SPCamera class!!!!
+ * added crazy experimental camera zoom and rotation abilities to platformer example
+ * rebuilt SPTilesets to support massive amounts of tiles
+ * SP class now has elapsedTime variable to write framerate independent code
+ * fixed bug in SPWorld removeAll class so it actually removes all
+ * added dispose flag to SPWorld
+ * cleaned up and removed a couple old unused classes
+
+----------------------------------------------------------------
+
 ###Update Version 1.2 Change Log
  * fixed issues with entities hit box collision
  * hit box size wasn't being factored in by pixelMask

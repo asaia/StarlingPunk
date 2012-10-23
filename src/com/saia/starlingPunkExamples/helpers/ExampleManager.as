@@ -3,6 +3,7 @@ package com.saia.starlingPunkExamples.helpers
 	import com.saia.starlingPunk.SP;
 	import com.saia.starlingPunk.utils.Key;
 	import com.saia.starlingPunk.utils.SPInput;
+	import com.saia.starlingPunkExamples.cameraScroller.worlds.ScrollingWorld;
 	import com.saia.starlingPunkExamples.platformer.controllers.LevelController;
 	import com.saia.starlingPunkExamples.shipShooter.worlds.PlayWorld;
 	import starling.text.TextField;
@@ -21,12 +22,14 @@ package com.saia.starlingPunkExamples.helpers
 			
 		}
 		
-		public static function displayText():void
+		public static function displayText(message:String = ""):void
 		{
 			var textField:TextField = createTextField();
-			textField.text = "use numbers keys (1-2) to see other examples";
+			textField.text = "use numbers keys (1-3) to see other examples " + message;
+			textField.hAlign = HAlign.LEFT;
 			
 			SP.world.addChildAt(textField, SP.world.numChildren);
+			textField.x = 200;
 			textField.y = 40;
 		}
 		
@@ -38,6 +41,11 @@ package com.saia.starlingPunkExamples.helpers
 			}
 			
 			if (SPInput.check(Key.DIGIT_2))
+			{
+				SP.world = new ScrollingWorld();
+			}
+			
+			if (SPInput.check(Key.DIGIT_3))
 			{
 				SP.world = new PlayWorld();
 			}

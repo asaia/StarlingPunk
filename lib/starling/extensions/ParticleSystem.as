@@ -26,13 +26,11 @@ package starling.extensions
     import starling.core.RenderSupport;
     import starling.core.Starling;
     import starling.display.DisplayObject;
-    import starling.display.Image;
     import starling.errors.MissingContextError;
     import starling.events.Event;
     import starling.textures.Texture;
-    import starling.textures.TextureSmoothing;
+    import starling.utils.MatrixUtil;
     import starling.utils.VertexData;
-    import starling.utils.transformCoords;
     
     public class ParticleSystem extends DisplayObject implements IAnimatable
     {
@@ -193,7 +191,7 @@ package starling.extensions
             if (resultRect == null) resultRect = new Rectangle();
             
             getTransformationMatrix(targetSpace, sHelperMatrix);
-            transformCoords(sHelperMatrix, 0, 0, sHelperPoint);
+            MatrixUtil.transformCoords(sHelperMatrix, 0, 0, sHelperPoint);
             
             resultRect.x = sHelperPoint.x;
             resultRect.y = sHelperPoint.y;
@@ -204,8 +202,6 @@ package starling.extensions
         
         public function advanceTime(passedTime:Number):void
         {
-            passedTime = Math.min(0.2, passedTime);
-            
             var particleIndex:int = 0;
             var particle:Particle;
             
@@ -224,8 +220,8 @@ package starling.extensions
                 {
                     if (particleIndex != mNumParticles - 1)
                     {
-                        var nextParticle:Particle = mParticles[mNumParticles - 1] as Particle;
-                        mParticles[mNumParticles-1] = particle;
+                        var nextParticle:Particle = mParticles[int(mNumParticles-1)] as Particle;
+                        mParticles[int(mNumParticles-1)] = particle;
                         mParticles[particleIndex] = nextParticle;
                     }
                     
@@ -250,7 +246,7 @@ package starling.extensions
                         if (mNumParticles == capacity)
                             raiseCapacity(capacity);
                     
-                        particle = mParticles[mNumParticles++] as Particle;
+                        particle = mParticles[int(mNumParticles++)] as Particle;
                         initParticle(particle);
                         advanceParticle(particle, mFrameTime);
                     }
@@ -324,6 +320,11 @@ package starling.extensions
             // it causes all previously batched quads/images to render.
             support.finishQuadBatch();
             
+            // make this call to keep the statistics display in sync.
+            // to play it safe, it's done in a backwards-compatible way here.
+            if (support.hasOwnProperty("raiseDrawCount"))
+                support.raiseDrawCount();
+            
             alpha *= this.alpha;
             
             var program:String = mTexture.mipMapping ? PROGRAM_MIPMAP : PROGRAM_NO_MIPMAP;
@@ -342,9 +343,9 @@ package starling.extensions
             context.setTextureAt(0, mTexture.base);
             
             context.setProgram(Starling.current.getProgram(program));
-            context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, support.mvpMatrix, true);
+            context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, support.mvpMatrix3D, true);
             context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, sRenderAlpha, 1);
-            context.setVertexBufferAt(0, mVertexBuffer, VertexData.POSITION_OFFSET, Context3DVertexBufferFormat.FLOAT_3); 
+            context.setVertexBufferAt(0, mVertexBuffer, VertexData.POSITION_OFFSET, Context3DVertexBufferFormat.FLOAT_2); 
             context.setVertexBufferAt(1, mVertexBuffer, VertexData.COLOR_OFFSET,    Context3DVertexBufferFormat.FLOAT_4);
             context.setVertexBufferAt(2, mVertexBuffer, VertexData.TEXCOORD_OFFSET, Context3DVertexBufferFormat.FLOAT_2);
             

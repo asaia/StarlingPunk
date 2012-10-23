@@ -12,7 +12,7 @@ package com.saia.starlingPunk
 		/**
 		 * The StarlingPunk version.
 		 */
-		public static const VERSION:String = "1.2";
+		public static const VERSION:String = "1.3";
 		
 		/**
 		 * Width of the game.
@@ -23,6 +23,11 @@ package com.saia.starlingPunk
 		 * Height of the game.
 		 */
 		public static var height:uint;
+		
+		/**
+		 * The time that has passed since the last frame (in seconds).
+		 */
+		public static var passedTime:Number;
 		
 		/**
 		 * Half the screen width.
@@ -44,6 +49,11 @@ package com.saia.starlingPunk
 			if (_world == value) return;
 			_goto = value;
 		}
+		
+		/**
+		 * Point used to determine drawing offset in the render loop.
+		 */
+		public static var camera:SPCamera = new SPCamera;
 		
 		/**
 		 * Finds the sign of the provided value.

@@ -20,8 +20,8 @@ package com.saia.starlingPunk
 		private var _layer:uint;
 		private var _originX:Number;
 		private var _originY:Number;
-		private var _scrollX:Number;
-		private var _scrollY:Number;
+		public var _worldX:Number;
+		private var _worldY:Number
 		
 		// Collision information.
 		private const HITBOX:SPMask = new SPMask;
@@ -30,12 +30,12 @@ package com.saia.starlingPunk
 		
 		public function SPEntity(x:Number = 0, y:Number = 0, type:String = "", mask:SPMask = null) 
 		{
-			_scrollX = 1;
-			_scrollY = 1;
 			_layer = 1;
 			_originX = 0;
 			_originY = 0;
 			_collidable = true;
+			_worldX = 0;
+			_worldY = 0;
 			
 			this.x = x;
 			this.y = y;
@@ -118,37 +118,6 @@ package com.saia.starlingPunk
 				world.setChildIndex(this, temp);
 			}
 			_layer = value;
-		}
-		
-				
-		/**
-		 * X scrollfactor, effects how much the camera offsets the drawn graphic.
-		 * Can be used for parallax effect, eg. Set to 0 to follow the camera,
-		 * 0.5 to move at half-speed of the camera, or 1 (default) to stay still.
-		 */
-		public function get scrollX():Number 
-		{
-			return _scrollX;
-		}
-		
-		public function set scrollX(value:Number):void 
-		{
-			_scrollX = value;
-		}
-		
-		/**
-		 * Y scrollfactor, effects how much the camera offsets the drawn graphic.
-		 * Can be used for parallax effect, eg. Set to 0 to follow the camera,
-		 * 0.5 to move at half-speed of the camera, or 1 (default) to stay still.
-		 */
-		public function get scrollY():Number 
-		{
-			return _scrollY;
-		}
-		
-		public function set scrollY(value:Number):void 
-		{
-			_scrollY = value;
 		}
 		
 				
@@ -360,7 +329,7 @@ package com.saia.starlingPunk
 		}
 		
 		/**
-		 * Center's the Entity's origin (half width and height)
+		 * Center's the Entity's origin (half width and height).
 		 */
 		public function centerOrigin():void
 		{
@@ -421,7 +390,12 @@ package com.saia.starlingPunk
 		/**
 		* Override this; called when Entity updates
 		*/
-		public function update():void { }
+		public function update():void 
+		{
+			var point:Point = new Point(x, y);
+			point = localToGlobal(point);
+			_worldX = point.x;
+		}
 		
 		/**
 		* Override this, called when the Entity is added to a World.

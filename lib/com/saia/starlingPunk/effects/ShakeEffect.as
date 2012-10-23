@@ -103,8 +103,8 @@ package com.saia.starlingPunk.effects
 		
 		private function shake():void
 		{
-			SP.world.x = Math.random() * _intensity - (_intensity * .5);
-			SP.world.y = Math.random() * _intensity - (_intensity * .5);
+			SP.world.x = _startPos.x - (Math.random() * _intensity - (_intensity * .5));
+			SP.world.y = _startPos.y - (Math.random() * _intensity - (_intensity * .5));
 		}
 	}
 }

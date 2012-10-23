@@ -18,6 +18,13 @@ package com.saia.starlingPunkExamples.embeds
 		[Embed(source="../../../../media/levels/level02.oel", mimeType="application/octet-stream")]
 		public static const LEVEL02:Class;
 		
+		
+		[Embed(source="../../../../media/levels/scrollingCamera.oep", mimeType="application/octet-stream")]
+		public static const OGMO_SCROLLING_PROJECT:Class;
+		
+		[Embed(source="../../../../media/levels/scrollingLevel.oel", mimeType="application/octet-stream")]
+		public static const SCROLLING_LEVEL:Class;
+		
 		//------------
 		//  texture atlas
 		//------------

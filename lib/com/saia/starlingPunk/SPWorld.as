@@ -13,6 +13,7 @@ package com.saia.starlingPunk
 		private var _addList:Vector.<SPEntity>;
 		private var _removeList:Vector.<SPEntity>;
 		private var _active:Boolean;
+		private var _disposeEntities:Boolean;
 		
 		public function SPWorld() 
 		{
@@ -22,6 +23,7 @@ package com.saia.starlingPunk
 			_addList = new Vector.<SPEntity>();
 			_removeList = new Vector.<SPEntity>();
 			
+			_disposeEntities = true;
 			_active = true;
 		}
 		
@@ -29,6 +31,10 @@ package com.saia.starlingPunk
 		//  getters and setters
 		//----------
 		
+		
+		/**
+		 * if the world is inactive entites won't be updated
+		 */
 		public function get active():Boolean 
 		{
 			return _active;
@@ -37,6 +43,19 @@ package com.saia.starlingPunk
 		public function set active(value:Boolean):void 
 		{
 			_active = value;
+		}
+		
+		/**
+		 * whether or not the world should dispose the entity when removing them, by defualt it is set to true
+		 */
+		public function get disposeEntities():Boolean 
+		{
+			return _disposeEntities;
+		}
+		
+		public function set disposeEntities(value:Boolean):void 
+		{
+			_disposeEntities = value;
 		}
 		
 		//----------
@@ -49,8 +68,11 @@ package com.saia.starlingPunk
 		public function engineUpdate():void 
 		{
 			updateLists();
-			updateEntities();
-			update();
+			if (_active)
+			{
+				updateEntities();
+				update();
+			}
 		}
 		
 		/**
@@ -86,15 +108,16 @@ package com.saia.starlingPunk
 		
 		/**
 		* removes all the entities from the world
+		* @param overrides the worlds disposeEntities property
 		*/
-		public function removeAll():void
+		public function removeAll(dispose:Boolean = true):void
 		{
+			_disposeEntities = dispose;
 			var entity:SPEntity;
-			var i:int = 0;
 			for each (var entities:Vector.<SPEntity> in _allEntities) 
 			{
 				var numEntities:int = entities.length;
-				for (i; i < numEntities; i++) 
+				for (var i:int = 0; i < numEntities; i++) 
 				{
 					entity = entities[i];
 					remove(entity);
@@ -159,7 +182,7 @@ package com.saia.starlingPunk
 			{
 				entity = _removeList[0];
 				entity.removed();
-				removeChild(entity, true);
+				removeChild(entity, _disposeEntities);
 				removeFromObjectLookup(entity);
 				//removes items till none are left
 				_removeList.splice(0, 1);

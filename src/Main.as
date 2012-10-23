@@ -7,11 +7,11 @@ package
 	import starling.core.Starling;
 	
 	/**
-	 * ...
+	 * This is normal Starling setup class
 	 * @author Andy Saia
 	 */
 	
-	//[SWF(width="640", height="480", backgroundColor="#00")]
+	[SWF(width="800", height="600", backgroundColor="#FFFFFF", frameRate="60")]
 	public class Main extends Sprite 
 	{
 		public function Main():void 

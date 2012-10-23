@@ -3,6 +3,7 @@ package com.saia.starlingPunk
 	import com.saia.starlingPunk.events.EngineEvent;
 	import com.saia.starlingPunk.utils.SPInput;
 	import starling.display.Sprite;
+	import starling.events.EnterFrameEvent;
 	import starling.events.Event;
 	
 	/**
@@ -28,8 +29,10 @@ package com.saia.starlingPunk
 		{	
 			// global game objects
 			SP.engine = this;
+			SP.camera = new SPCamera();
 			SP._world = new SPWorld;
-			addChild(SP._world);
+			addChild(SP.camera.container);
+			SP.camera.container.addChild(SP._world);
 			
 			// on-stage event listener
 			addEventListener(Event.ADDED_TO_STAGE, onStage);
@@ -98,10 +101,12 @@ package com.saia.starlingPunk
 		}
 		
 		/** @private Framerate independent game loop. */
-		private function onEnterFrame(e:Event):void
+		private function onEnterFrame(e:EnterFrameEvent):void
 		{	
 			// update loop
 			if (!_paused) update();
+			
+			SP.passedTime = e.passedTime;
 			
 			// update input
 			SPInput.update();
@@ -113,12 +118,13 @@ package com.saia.starlingPunk
 			if (!SP._goto) return;
 			
 			SP._world.end();
-			removeChild(SP._world, true);
+			SP.camera.container.removeChild(SP._world, true);
 			SP._world.updateLists();
 			SP._world = SP._goto;
 			SP._goto = null;
 			SP._world.updateLists();
-			addChild(SP._world);
+			SP.camera.container.addChild(SP._world);
+			SP.camera.setWorld(SP._world);
 			SP._world.begin();
 			SP._world.updateLists();
 		}
