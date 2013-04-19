@@ -73,7 +73,5 @@ StarlingPunk is a framework built on top the Starling library designed to add st
 * Tons of tools and extensions will already work, like sprite-manager and particles
 
 ### Planned future releases:
-* Integration with the box2D physics library
-* Helper class for the Ogmo level editor
+* Integration with the Nape physics library
 * Helper functions for sound effects
-* Component based behavior system sorta like Unity3D
