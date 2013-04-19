@@ -11,3 +11,5 @@ bin-release/
 /obj
 /obj
 /obj
+/obj/StarlingPunkExampleConfig.old
+/obj/StarlingPunkExampleConfig.xml
