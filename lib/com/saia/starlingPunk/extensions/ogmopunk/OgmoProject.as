@@ -102,6 +102,30 @@ package com.saia.starlingPunk.extensions.ogmopunk
 		
 		/**
 		 * creates an image vector for each tileset, this method must be called before a level is loaded
+		 * @param a texture that contains all the tiles in the tile set
+		 */
+		static public function createTileSetListFromTexture(tileSetName:String, texture:Texture, tileWidth:Number, tileHeight:Number):void 
+		{
+			var tileList:Vector.<Image> = new Vector.<Image>();
+			var numColumns:int = texture.width / tileWidth;
+			var numRows:int = texture.height / tileHeight;
+			for (var i:int = 0; i < numColumns; i++) 
+			{
+				for (var j:int = 0; j < numRows; j++) 
+				{
+					var rect:Rectangle = new Rectangle(i * tileWidth, j * tileHeight, tileWidth, tileHeight);
+					var subTexture:Texture =Texture.fromTexture(texture, rect);
+					var tileImage:Image = new Image(subTexture);
+					tileList.push(tileImage);
+				}
+			}
+			
+			mTileSetImages = new Dictionary();
+			mTileSetImages[tileSetName] = tileList;
+		}
+		
+		/**
+		 * creates an image vector for each tileset, this method must be called before a level is loaded
 		 * @param	the tilesset name as it appears in the Ogmo editor
 		 * @param	bitmapData
 		 */

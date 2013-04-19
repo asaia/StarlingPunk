@@ -1,5 +1,6 @@
 package com.saia.starlingPunk 
 {
+	import com.saia.starlingPunk.behaviors.BehaviorManager;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getDefinitionByName;
@@ -20,8 +21,7 @@ package com.saia.starlingPunk
 		private var _layer:uint;
 		private var _originX:Number;
 		private var _originY:Number;
-		public var _worldX:Number;
-		private var _worldY:Number
+		private var _behaviorManager:BehaviorManager;
 		
 		// Collision information.
 		private const HITBOX:SPMask = new SPMask;
@@ -34,11 +34,12 @@ package com.saia.starlingPunk
 			_originX = 0;
 			_originY = 0;
 			_collidable = true;
-			_worldX = 0;
-			_worldY = 0;
 			
 			this.x = x;
 			this.y = y;
+			
+			_behaviorManager = new BehaviorManager();
+			
 			if (type == "")
 				type = getQualifiedClassName(this);
 			this._type = type;
@@ -46,6 +47,8 @@ package com.saia.starlingPunk
 			if (mask) this.mask = mask;
 			HITBOX.assignTo(this);
 			_class = Class(getDefinitionByName(getQualifiedClassName(this)));
+			
+			_hitBounds = new Rectangle();
 		}
 		
 		//----------
@@ -152,7 +155,8 @@ package com.saia.starlingPunk
 		 */
 		public function get hitWidth():Number 
 		{
-			return getRect(x, y).width;
+			
+			return _hitBounds.width;
 		}
 		
 		public function set hitWidth(value:Number):void 
@@ -165,12 +169,20 @@ package com.saia.starlingPunk
 		 */
 		public function get hitHeight():Number 
 		{
-			return getRect(x, y).height;
+			return _hitBounds.height;
 		}
 		
 		public function set hitHeight(value:Number):void 
 		{
 			setHitHeight(value);
+		}
+		
+		/**
+		 * uses the manager to add and remove behaviors to this entity
+		 */
+		public function get behaviorManager():BehaviorManager 
+		{
+			return _behaviorManager;
 		}
 		
 		//-------------------
@@ -235,6 +247,7 @@ package com.saia.starlingPunk
 			var entity:SPEntity;
 			
 			var allEnitiesOfType:Vector.<SPEntity> = this.world.getType(type);
+			
 			//if undefined return
 			if (!allEnitiesOfType) return null;
 			var numEnities:int = allEnitiesOfType.length;
@@ -264,7 +277,7 @@ package com.saia.starlingPunk
 			var entity:SPEntity;
 			for each (var type:String in types)
 			{
-				if ((entity = collide(type, x, y))) return entity;
+				if ((entity == collide(type, x, y))) return entity;
 			}
 			return null;
 		}
@@ -293,13 +306,15 @@ package com.saia.starlingPunk
 		 */
 		public function getRect(xOffset:Number, yOffset:Number):Rectangle
 		{
-			var rect:Rectangle = this.getBounds(this);
-			if (_hitBounds)
-				rect = _hitBounds;
-				
-			rect.x = xOffset - pivotX - _originX;
-			rect.y = yOffset - pivotY - _originY;
-			return rect;
+			if (_hitBounds.width == 0)
+				_hitBounds.width = getBounds(this).width;
+			if (_hitBounds.height == 0)
+				_hitBounds.height = getBounds(this).height;
+			
+			_hitBounds.x = xOffset - pivotX - _originX;
+			_hitBounds.y = yOffset - pivotY - _originY;
+			
+			return _hitBounds;
 		}
 		
 		/**
@@ -311,8 +326,8 @@ package com.saia.starlingPunk
 		 */
 		public function setHitbox(width:int = 0, height:int = 0, originX:int = 0, originY:int = 0):void
 		{
-			this.width = width;
-			this.height = height;
+			setHitWidth(width);
+			setHitHeight(height);
 			this.originX = originX;
 			this.originY = originY;
 		}
@@ -394,7 +409,8 @@ package com.saia.starlingPunk
 		{
 			var point:Point = new Point(x, y);
 			point = localToGlobal(point);
-			_worldX = point.x;
+			
+			_behaviorManager.update();
 		}
 		
 		/**

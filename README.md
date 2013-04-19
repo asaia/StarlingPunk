@@ -1,6 +1,15 @@
 StarlingPunk
 ============
 
+###Update Version 1.4 Change Log
+* added Starling's new AssetManager class to SP for easy access
+* updated to starling 1.3
+* added behavior system
+* laid ground work for debug console
+* several performance optimizations partially when getting an entity's width/height
+
+----------------------------------------------------------------
+
 ###Update Version 1.3 Change Log
  * created SPCamera class!!!!
  * added crazy experimental camera zoom and rotation abilities to platformer example

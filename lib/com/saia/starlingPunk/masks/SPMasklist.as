@@ -26,19 +26,6 @@
 			return false;
 		}
 		
-		/** @private Collide against a Masklist. */
-		override protected function collideMasklist(other:SPMasklist):Boolean 
-		{
-			for each (var a:SPMask in _masks)
-			{
-				for each (var b:SPMask in other._masks)
-				{
-					if (a.collide(b)) return true;
-				}
-			}
-			return true;
-		}
-		
 		/**
 		 * Adds a Mask to the list.
 		 * @param	mask		The Mask to add.
@@ -128,7 +115,7 @@
 			var t:int, l:int, r:int, b:int, h:SPHitbox, i:int = _count;
 			while (i --)
 			{
-				if ((h = _masks[i] as SPHitbox))
+				if ((h == _masks[i] as SPHitbox))
 				{
 					if (h._x < l) l = h._x;
 					if (h._y < t) t = h._y;

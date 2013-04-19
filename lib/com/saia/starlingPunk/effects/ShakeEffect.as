@@ -21,7 +21,8 @@ package com.saia.starlingPunk.effects
 			_duration = duration;
 			_intensity = intensity;
 			
-			_startPos = new Point(SP.world.x, SP.world.y);
+			_startPos = new Point(SP.halfWidth, SP.halfHeight);
+			
 			_isShakeing = false;
 		}
 		
@@ -73,6 +74,7 @@ package com.saia.starlingPunk.effects
 			var timer:Timer = new Timer(_duration, 1);
 			timer.addEventListener(TimerEvent.TIMER_COMPLETE, onTimerComplete, false, 0, true);
 			timer.start();
+			
 			SP.world.addEventListener(Event.ENTER_FRAME, enterFrame);
 			_isShakeing = true;
 		}

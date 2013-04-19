@@ -1,8 +1,10 @@
 package com.saia.starlingPunk
 {
+	import com.saia.starlingPunk.console.SPConsole;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import starling.display.Stage;
+	import starling.utils.AssetManager;
 	
 	/**
 	 * Static catch-all class used to access global properties and functions.
@@ -12,7 +14,7 @@ package com.saia.starlingPunk
 		/**
 		 * The StarlingPunk version.
 		 */
-		public static const VERSION:String = "1.3";
+		public static const VERSION:String = "1.4";
 		
 		/**
 		 * Width of the game.
@@ -54,6 +56,11 @@ package com.saia.starlingPunk
 		 * Point used to determine drawing offset in the render loop.
 		 */
 		public static var camera:SPCamera = new SPCamera;
+		
+		/**
+		 * Starling's AssetManager stored here for easy asset creation
+		 */
+		public static var assets:AssetManager;
 		
 		/**
 		 * Finds the sign of the provided value.
@@ -473,9 +480,19 @@ package com.saia.starlingPunk
 			if (i < right) quicksortBy(a, i, right, ascending, property);
 		}
 		
+		/**
+		 * The global Console object.
+		 */
+		public static function get console():SPConsole
+		{
+			if (!_console) _console = new SPConsole();
+			return _console;
+		}
+		
 		// World information.
 		/** @private */ internal static var _world:SPWorld;
 		/** @private */ internal static var _goto:SPWorld;
+		/** @private */ internal static var _console:SPConsole;
 		
 		// Used for rad-to-deg and deg-to-rad conversion.
 		/** @private */ public static const DEG:Number = -180 / Math.PI;

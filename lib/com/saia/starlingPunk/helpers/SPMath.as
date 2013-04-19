@@ -26,5 +26,21 @@ package com.saia.starlingPunk.helpers
 			var index:int = Math.floor(Math.random() * array.length);
 			return index;
 		}
+		
+		/**
+		 * converts degrees to radians
+		 */
+		public static function degreesToRadians(degrees:Number):Number
+		{
+			return degrees * Math.PI / 180;
+		}
+		
+		/**
+		 * converts radians to degrees
+		 */
+		public static function radiansToDegrees(radians:Number):Number
+		{
+			return radians * 180 / Math.PI;
+		}
 	}
 }

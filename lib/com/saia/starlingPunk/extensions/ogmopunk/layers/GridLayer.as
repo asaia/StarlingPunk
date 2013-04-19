@@ -18,10 +18,7 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 		
 		override public function loadData():Vector.<SPEntity> 
 		{
-			
 			var e:SPEntity = new SPEntity(0, 0, name);
-			e.setHitWidth(OgmoProject.levelDims.x);
-			e.setHitHeight(OgmoProject.levelDims.y);
 			var grid:SPGrid = new SPGrid(OgmoProject.levelDims.x, OgmoProject.levelDims.y, grid.x, grid.y);
 			if (exportMode == "Bitstring")
 			{
@@ -29,6 +26,8 @@ package com.saia.starlingPunk.extensions.ogmopunk.layers
 			}
 			e.mask = grid;
 			
+			e.setHitWidth(OgmoProject.levelDims.x);
+			e.setHitHeight(OgmoProject.levelDims.y);
 			var es:Vector.<SPEntity> = new Vector.<SPEntity>();
 			es.push(e);
 			return es;

@@ -103,7 +103,7 @@ package com.saia.starlingPunk
 		{
 			if (!entity.world) return;
 			_removeList.push(entity);
-			entity.world = null;
+			//entity.world = null;
 		}
 		
 		/**
@@ -123,6 +123,22 @@ package com.saia.starlingPunk
 					remove(entity);
 				}
 			}
+		}
+		
+		/**
+		 * returns a vector of ever entity in the world
+		 * @return
+		 */
+		public function getAllEntities():Vector.<SPEntity>
+		{
+			var entity:SPEntity;
+			var allEntities:Vector.<SPEntity> = new Vector.<SPEntity>();
+			for each (var entities:Vector.<SPEntity> in _allEntities) 
+			{
+				allEntities = allEntities.concat(entities);
+			}
+			
+			return allEntities;
 		}
 		
 		/**
@@ -181,7 +197,9 @@ package com.saia.starlingPunk
 			while (this._removeList.length) 
 			{
 				entity = _removeList[0];
+				entity.behaviorManager.removeAllBehaviors();
 				entity.removed();
+				entity.world = null;
 				removeChild(entity, _disposeEntities);
 				removeFromObjectLookup(entity);
 				//removes items till none are left

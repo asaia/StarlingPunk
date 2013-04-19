@@ -2,9 +2,11 @@ package com.saia.starlingPunk
 {	
 	import com.saia.starlingPunk.events.EngineEvent;
 	import com.saia.starlingPunk.utils.SPInput;
+	import starling.core.Starling;
 	import starling.display.Sprite;
 	import starling.events.EnterFrameEvent;
 	import starling.events.Event;
+	import starling.utils.AssetManager;
 	
 	/**
 	 * Main game Sprite class, Manages the game loop.
@@ -31,6 +33,7 @@ package com.saia.starlingPunk
 			SP.engine = this;
 			SP.camera = new SPCamera();
 			SP._world = new SPWorld;
+			SP.assets = new AssetManager();
 			addChild(SP.camera.container);
 			SP.camera.container.addChild(SP._world);
 			
@@ -110,6 +113,9 @@ package com.saia.starlingPunk
 			
 			// update input
 			SPInput.update();
+			
+			// update console
+			if (SP._console) SP._console.update();
 		}
 		
 		/** @private Switch Worlds if they've changed. */
