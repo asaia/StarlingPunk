@@ -353,29 +353,6 @@ package com.saia.starlingPunk
 		}
 		
 		/**
-		 * displays hitbox for debug purposes 
-		 */
-		/*
-		 * This method doesn't seem to reliably display the position of the entites hitbox so its been commented out until a better way to do this is figured out
-		 * 
-		public function showHitBox(x:Number, y:Number):void
-		{
-			var shape:Shape = new Shape();
-			var hitRect:Rectangle = getRect(x, y);
-			shape.graphics.lineStyle(1, 0xFF0000);
-			shape.graphics.drawRect(0, 0, hitRect.width, hitRect.height);
-			
-			if (hitRect.width == 0) return;
-			var bmpData:BitmapData = new BitmapData(hitRect.width + 2, hitRect.height + 2, true, 0xFF);
-			bmpData.draw(shape, shape.transform.matrix, shape.transform.colorTransform);
-			var image:Image = new Image(Texture.fromBitmapData(bmpData));
-			addChild(image);
-			image.x = x - this.x;
-			image.y = y - this.y;
-		}
-		*/
-		
-		/**
 		 * sets the hit bounds width
 		 * @param	width
 		 */
