@@ -1,8 +1,13 @@
 ﻿package com.saia.starlingPunk.utils
 {
 	import com.saia.starlingPunk.SP;
-	import starling.events.KeyboardEvent;
+	import flash.events.MouseEvent;
 	import flash.ui.Keyboard;
+	import starling.core.Starling;
+	import starling.events.KeyboardEvent;
+	import starling.events.Touch;
+	import starling.events.TouchEvent;
+	import starling.events.TouchPhase;
 	
 	/**
 	 * Static class updated by Engine. Use for defining and checking keyboard input.
@@ -19,6 +24,64 @@
 		 * The last key pressed.
 		 */
 		public static var lastKey:int;
+		
+		/**
+		 * X position of the mouse on the screen.
+		 */
+		public static var mouseX:int = 0;
+		
+		/**
+		 * Y position of the mouse on the screen.
+		 */
+		public static var mouseY:int = 0;
+		
+		/**
+		 * If the mouse button is down.
+		 */
+		public static var mouseDown:Boolean = false;
+		
+		/**
+		 * If the mouse button is up.
+		 */
+		public static var mouseUp:Boolean = true;
+		
+		/**
+		 * If the mouse button was pressed this frame.
+		 */
+		public static var mousePressed:Boolean = false;
+		
+		/**
+		 * The Starling touch object
+		 */
+		public static var touch:Touch;
+		
+		/**
+		 * A list of Starling touch objects over the Stage
+		 */
+		static public var touches:Vector.<Touch>;
+		
+		/**
+		 * If the mouse button was released this frame.
+		 */
+		public static var mouseReleased:Boolean = false;
+		
+		/**
+		 * If the mouse wheel was moved this frame.
+		 */
+		public static var mouseWheel:Boolean = false; 
+		
+		/**
+		 * If the mouse wheel was moved this frame, this was the delta.
+		 */
+		public static function get mouseWheelDelta():int
+		{
+			if (mouseWheel)
+			{
+				mouseWheel = false;
+				return _mouseWheelDelta;
+			}
+			return 0;
+		}  
 		
 		/**
 		 * Defines a new input.
@@ -112,6 +175,8 @@
 			{
 				SP.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 				SP.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+				SP.stage.addEventListener(TouchEvent.TOUCH, onTouch);
+				Starling.current.nativeStage.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel, false, 0, true);
 				_enabled = true;
 			}
 		}
@@ -123,6 +188,8 @@
 			_pressNum = 0;
 			while (_releaseNum --) _release[_releaseNum] = -1;
 			_releaseNum = 0;
+			if (mousePressed) mousePressed = false;
+			if (mouseReleased) mouseReleased = false;
 		}
 		
 		/**
@@ -176,6 +243,39 @@
 			}
 		}
 		
+		static private function onTouch(e:TouchEvent):void 
+		{
+			touches = e.getTouches(SP.stage);
+			touch = e.getTouch(SP.stage);
+			if (!touch) return;
+			
+			mouseX = touch.globalX;
+			mouseY = touch.globalY;
+			
+			if (touch.phase == TouchPhase.MOVED || touch.phase == TouchPhase.BEGAN)
+			{
+				if (!mouseDown)
+				{
+					mouseDown = true;
+					mouseUp = false;
+					mousePressed = true;
+				}
+			}
+			else
+			{
+				mouseDown = false;
+				mouseUp = true;
+				mouseReleased = true;
+			}
+		}
+		
+		/** @private Event handler for mouse wheel events */
+		private static function onMouseWheel(e:MouseEvent):void
+		{
+		    mouseWheel = true;
+		    _mouseWheelDelta = e.delta;
+		}
+		
 		// Max amount of characters stored by the keystring.
 		/** @private */ private static const KEYSTRING_MAX:uint = 100;
 		
@@ -187,6 +287,7 @@
 		/** @private */ private static var _release:Vector.<int> = new Vector.<int>(256);
 		/** @private */ private static var _pressNum:int = 0;
 		/** @private */ private static var _releaseNum:int = 0;
-		/** @private */ private static var _control:Object = {};
+		/** @private */ private static var _control:Object = { };
+		/** @private */ private static var _mouseWheelDelta:int = 0;
 	}
 }

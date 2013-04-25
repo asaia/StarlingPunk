@@ -1,6 +1,11 @@
 StarlingPunk
 ============
 
+###Update Version 1.5 Change Log
+* added mouseX, mouseY and mouseWheelDelta support to SPInput
+
+----------------------------------------------------------------
+
 ###Update Version 1.4 Change Log
 * added Starling's new AssetManager class to SP for easy access
 * updated to starling 1.3
