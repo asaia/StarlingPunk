@@ -5,6 +5,7 @@ package com.saia.starlingPunk
 	import flash.geom.Rectangle;
 	import starling.display.Stage;
 	import starling.utils.AssetManager;
+	import flash.utils.ByteArray;
 	
 	/**
 	 * Static catch-all class used to access global properties and functions.
@@ -222,6 +223,17 @@ package com.saia.starlingPunk
 		{
 			object.x = clamp(object.x, x + padding, x + width - padding);
 			object.y = clamp(object.y, y + padding, y + height - padding);
+		}
+		
+		/**
+		 * Loads the file as an XML object.
+		 * @param	file		The embedded file to load.
+		 * @return	An XML object representing the file.
+		 */
+		public static function getXML(file:Class):XML
+		{
+			var bytes:ByteArray = new file;
+			return XML(bytes.readUTFBytes(bytes.length));
 		}
 		
 		/**
