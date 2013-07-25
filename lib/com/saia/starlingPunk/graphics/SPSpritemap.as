@@ -1,5 +1,6 @@
-package com.saia.starlingPunk.graphics 
+package com.saia.starlingPunk.graphics
 {
+	import com.saia.starlingPunk.SP;
 	import flash.utils.Dictionary;
 	import starling.core.Starling;
 	import starling.display.Sprite;
@@ -10,9 +11,6 @@ package com.saia.starlingPunk.graphics
 	
 	public class SPSpritemap extends Sprite 
 	{
-		[Embed(source = "dummyAtlasXML.png")] private static const dummyImage:Class;
-		[Embed(source = "dummyAtlasXML.xml", mimeType = "application/octet-stream")] private static const dummyImageXML:Class;
-		
 		private static var spritemapAnimations:Dictionary = new Dictionary();
 		
 		private var currentAnimationState:String = "default";
@@ -22,7 +20,7 @@ package com.saia.starlingPunk.graphics
 		
 		public var callback:Function;
 		
-		private var dummyClip:MovieClip;
+		private var errorTold:Boolean = false;
 		
 		/**
 		 * Holds & controls multiple movieClips
@@ -35,55 +33,92 @@ package com.saia.starlingPunk.graphics
 			callback = _callback;
 			
 			this.addEventListener(Event.ENTER_FRAME, onFrame);
-			
-			//Create a dummy movie clip, the default state if no animations have been added or told to play
-			var dummyAtlas:TextureAtlas = new TextureAtlas(Texture.fromBitmap(new dummyImage()), XML(new dummyImageXML()));
-			dummyClip = new MovieClip(dummyAtlas.getTextures("test_"), 1);
-			spritemapAnimations["default"] = dummyClip;
-			addChild(dummyClip);
-			dummyClip.visible = false;
-			currentAnimationState = "default";
-			
 		}
 		
 		private function onFrame(e:Event):void 
 		{
-			//Switch animations if new animation is chosen
-			if (currentAnimationState != newAnimationState)
+			try
 			{
-				removeChild(spritemapAnimations[currentAnimationState]);
-				Starling.juggler.remove(spritemapAnimations[currentAnimationState]);
+				//Switch animations if new animation is chosen
+				if (currentAnimationState != newAnimationState)
+				{
+					removeChild(spritemapAnimations[currentAnimationState]);
+					Starling.juggler.remove(spritemapAnimations[currentAnimationState]);
+					spritemapAnimations[currentAnimationState].removeEventListener(Event.COMPLETE, onFrameFinish);
+					
+					currentAnimationState = newAnimationState;
 				
-				currentAnimationState = newAnimationState;
-				
-				addChild(spritemapAnimations[currentAnimationState]);
-				Starling.juggler.add(spritemapAnimations[currentAnimationState]);
+					addChild(spritemapAnimations[currentAnimationState]);
+					Starling.juggler.add(spritemapAnimations[currentAnimationState]);
+					spritemapAnimations[currentAnimationState].addEventListener(Event.COMPLETE, onFrameFinish);
+				}
 			}
-			
-			//At the end of the current frame, call optional function
-			if (spritemapAnimations[currentAnimationState].currentFrame == (spritemapAnimations[currentAnimationState].numFrames - 1))
+			catch(err:TypeError)
 			{
-				if (callback != null) { callback(); }
+				if (!errorTold)
+				{
+					trace("WARNING: " + this + " has no animations. Please use .add() to create one");
+					errorTold = true;
+				}
 			}
 		}
 		
+		private function onFrameFinish(e:Event):void 
+		{
+			if (callback != null) { callback(); }
+		}
+		
 		/**
-		 * Add a new animation to the spritemap
-		 * @param	name		The name of the animation. Use prefix, sans "_"
-		 * @param	frameRate	The frame-rate of the animation
-		 * @param	loop		If the animation will loop once complete
+		 * Adds new animation to the spritemap
+		 * @param	name		The name of the animation to call
+		 * @param	frameRate	The framerate of the animation
+		 * @param	prefix		The prefix used in texture atlas
+		 * @param	loop		If the animation loops once complete
 		 */
-		public function add(name:String, frameRate:Number = 1, loop:Boolean = true):void
+		public function add(name:String, frameRate:Number = 1, prefix:String = "_", loop:Boolean = true):void
 		{
 			//Only get animation if animation has not already been defined
 			if (spritemapAnimations[name] == undefined) 
 			{
 				//Grab frames of animation from atlas
-				var aniFrames:Vector.<Texture> = atlas.getTextures(String(name + "_"));
+				var aniFrames:Vector.<Texture> = atlas.getTextures(String("name" + prefix));
 				
 				spritemapAnimations[name] = new MovieClip(aniFrames, frameRate);
 				spritemapAnimations[name].loop = loop;
 			}
+		}
+		
+		/**
+		 * Adds a frame at the end of the specified animation
+		 * @param	name	The name of the animation to insert
+		 * @param	texture
+		 * @param	duration
+		 */
+		public function addFrame(name:String, texture:Texture, duration:Number = 0.5):void
+		{
+			if (spritemapAnimations[name] != undefined) { spritemapAnimations[name].addFrame(texture, null, duration) };
+		}
+		
+		/**
+		 * Adds a frame at specified frame in specified animation
+		 * @param	name
+		 * @param	frame
+		 * @param	texture
+		 * @param	duration
+		 */
+		public function addFrameAt(name:String, frame:int, texture:Texture, duration:Number = 0.5):void
+		{
+			if (spritemapAnimations[name] != undefined) { spritemapAnimations[name].addFrame(frame, texture, null, duration); }
+		}
+		
+		/**
+		 * Removes a specified frame in specified animation
+		 * @param	name
+		 * @param	frame
+		 */
+		public function removeFrameAt(name:String, frame:int):void
+		{
+			if (spritemapAnimations[name != undefined) { spritemapAnimations[name].removeFrameAt(frame); }
 		}
 		
 		/**
@@ -92,8 +127,37 @@ package com.saia.starlingPunk.graphics
 		 */
 		public function play(name:String):void
 		{
-			if (spritemapAnimations[name] != undefined) { newAnimationState = name; }
+			if (spritemapAnimations[currentAnimationState] != undefined) { newAnimationState = name; }
 		}
+		
+		/**
+		 * Stops current animation, resetting it's frame to the first
+		 */
+		public function stop():void
+		{
+			spritemapAnimations[currentAnimationState].stop();
+		}
+		
+		/**
+		 * Pauses current animation
+		 */
+		public function pause():void
+		{
+			spritemapAnimations[currentAnimationState].pause();
+		}
+		
+		/**
+		 * Resumes current animation
+		 */
+		public function resume():void
+		{
+			spritemapAnimations[currentAnimationState].play();
+		}
+		
+		/**
+		 * The current frame ID in the current animation
+		 */
+		public function get currentFrame():int { return spritemapAnimations[name].currentFrame; }
 	}
 
 }
