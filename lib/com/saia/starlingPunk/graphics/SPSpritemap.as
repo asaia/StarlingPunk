@@ -44,13 +44,11 @@ package com.saia.starlingPunk.graphics
 				{
 					removeChild(spritemapAnimations[currentAnimationState]);
 					Starling.juggler.remove(spritemapAnimations[currentAnimationState]);
-					spritemapAnimations[currentAnimationState].removeEventListener(Event.COMPLETE, onFrameFinish);
 					
 					currentAnimationState = newAnimationState;
 				
 					addChild(spritemapAnimations[currentAnimationState]);
 					Starling.juggler.add(spritemapAnimations[currentAnimationState]);
-					spritemapAnimations[currentAnimationState].addEventListener(Event.COMPLETE, onFrameFinish);
 				}
 			}
 			catch(err:TypeError)
