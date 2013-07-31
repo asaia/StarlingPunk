@@ -2,6 +2,7 @@ package com.saia.starlingPunk
 {
 	import flash.utils.Dictionary;
 	import starling.display.Sprite;
+	import com.saia.starlingPunk.SPEntity;
 	/**
 	 * Updated by Engine, main game container that holds all currently active Entities.
 	 * Useful for organization, eg. "Menu", "Level1", etc.
@@ -10,6 +11,7 @@ package com.saia.starlingPunk
 	public class SPWorld extends Sprite
 	{	
 		private var _allEntities:Dictionary;
+		private var _entityNames:Dictionary;
 		private var _addList:Vector.<SPEntity>;
 		private var _removeList:Vector.<SPEntity>;
 		private var _active:Boolean;
@@ -19,6 +21,7 @@ package com.saia.starlingPunk
 		{
 			//probably dictionary
 			_allEntities = new Dictionary();
+			_entityNames = new Dictionary();
 			
 			_addList = new Vector.<SPEntity>();
 			_removeList = new Vector.<SPEntity>();
@@ -249,6 +252,29 @@ package com.saia.starlingPunk
 				entityTypeArray = null;
 			}
 		}
+		
+		/** @private	Registers the Entity's instance name */
+		internal function registerName(e:SPEntity):void
+		{
+			_entityNames[e._name] = e;
+		}
+		
+		/** @private	Unregisters the Entity's instance name */
+		internal function unregisterName(e:SPEntity):void
+		{
+			if (_entityNames[e._name] == e) { delete _entityNames[e._name]; }	
+		}
+		
+		/**
+		 * Returns the Entity with the instance name, or null if none exists.
+		 * @param	name	Instance name of the Entity.
+		 * @return	An Entity in this world.
+		 */
+		public function getInstance(name:String):*
+		{
+			return _entityNames[name];
+		}
+		
 		
 		//----------
 		//  abstract methods
