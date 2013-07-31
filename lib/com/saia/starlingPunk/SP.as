@@ -519,5 +519,6 @@ package com.saia.starlingPunk
 		/** @private */ public static var point:Point = new Point;
 		/** @private */ public static var point2:Point = new Point;
 		/** @private */ public static var rect:Rectangle = new Rectangle;
+		/** @private */ public static var entity:SPEntity;
 	}
 }
