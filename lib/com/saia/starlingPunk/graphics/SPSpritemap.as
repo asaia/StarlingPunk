@@ -11,10 +11,10 @@ package com.saia.starlingPunk.graphics
 	
 	public class SPSpritemap extends Sprite 
 	{
-		private static var spritemapAnimations:Dictionary = new Dictionary();
+		public var spritemapAnimations:Dictionary = new Dictionary();
 		
-		private var currentAnimationState:String = "default";
-		private var newAnimationState:String;
+		public var currentAnimationState:String = "default";
+		public var newAnimationState:String;
 		
 		private var atlas:TextureAtlas;
 		
@@ -50,20 +50,20 @@ package com.saia.starlingPunk.graphics
 					addChild(spritemapAnimations[currentAnimationState]);
 					Starling.juggler.add(spritemapAnimations[currentAnimationState]);
 				}
+				
+				if (spritemapAnimations[currentAnimationState].currentFrame == spritemapAnimations[currentAnimationState].numFrames - 1)
+				{
+					if (callback != null) { callback(); }
+				}
 			}
 			catch(err:TypeError)
 			{
 				if (!errorTold)
 				{
-					trace("WARNING: " + this + " has no animations. Please use .add() to create one");
+					trace("WARNING: " + this + " has no animations, or none are playing. Please use .add() to create one & .play() to play an animation");
 					errorTold = true;
 				}
 			}
-		}
-		
-		private function onFrameFinish(e:Event):void 
-		{
-			if (callback != null) { callback(); }
 		}
 		
 		/**
@@ -73,13 +73,13 @@ package com.saia.starlingPunk.graphics
 		 * @param	prefix		The prefix used in texture atlas
 		 * @param	loop		If the animation loops once complete
 		 */
-		public function add(name:String, frameRate:Number = 1, prefix:String = "_", loop:Boolean = true):void
+		public function add(name:String, _aniFrames:Vector.<Texture>, frameRate:Number = 1, loop:Boolean = true):void
 		{
 			//Only get animation if animation has not already been defined
 			if (spritemapAnimations[name] == undefined) 
 			{
 				//Grab frames of animation from atlas
-				var aniFrames:Vector.<Texture> = atlas.getTextures(String("name" + prefix));
+				var aniFrames:Vector.<Texture> = _aniFrames;
 				
 				spritemapAnimations[name] = new MovieClip(aniFrames, frameRate);
 				spritemapAnimations[name].loop = loop;
@@ -116,7 +116,7 @@ package com.saia.starlingPunk.graphics
 		 */
 		public function removeFrameAt(name:String, frame:int):void
 		{
-			if (spritemapAnimations[name != undefined) { spritemapAnimations[name].removeFrameAt(frame); }
+			if (spritemapAnimations[name] != undefined) { spritemapAnimations[name].removeFrameAt(frame); }
 		}
 		
 		/**
@@ -125,7 +125,7 @@ package com.saia.starlingPunk.graphics
 		 */
 		public function play(name:String):void
 		{
-			if (spritemapAnimations[currentAnimationState] != undefined) { newAnimationState = name; }
+			if (spritemapAnimations[name] != undefined) { newAnimationState = name; }
 		}
 		
 		/**
