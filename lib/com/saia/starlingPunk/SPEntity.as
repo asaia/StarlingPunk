@@ -18,6 +18,7 @@ package com.saia.starlingPunk
 		private var _type:String;
 		private var _hitBounds:Rectangle;
 		private var _collidable:Boolean;
+		private var _isDestroyed:Boolean;
 		private var _layer:uint;
 		private var _originX:Number;
 		private var _originY:Number;
@@ -34,6 +35,7 @@ package com.saia.starlingPunk
 			_originX = 0;
 			_originY = 0;
 			_collidable = true;
+			_isDestroyed = false;
 			
 			this.x = x;
 			this.y = y;
@@ -91,6 +93,17 @@ package com.saia.starlingPunk
 		public function set collidable(value:Boolean):void 
 		{
 			_collidable = value;
+		}
+		
+		/**
+		 * If the Entity is currently waiting to be destroyed.
+		 * This is mostly for internal use and should not be touched unless you
+		 * know what you are doing.
+		 */
+		public function get isDestroyed():Boolean { return _isDestroyed; }
+		public function set isDestroyed(value:Boolean):void
+		{
+			_isDestroyed = value;
 		}
 		
 		/**

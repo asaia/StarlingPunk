@@ -101,7 +101,8 @@ package com.saia.starlingPunk
 		 */
 		public function remove(entity:SPEntity):void
 		{
-			if (!entity.world) return;
+			if (!entity.world || entity.isDestroyed) return;
+			entity.isDestroyed = true;
 			_removeList.push(entity);
 			//entity.world = null;
 		}
