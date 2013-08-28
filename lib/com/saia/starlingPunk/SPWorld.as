@@ -1,6 +1,7 @@
 package com.saia.starlingPunk 
 {
 	import flash.utils.Dictionary;
+	import starling.display.DisplayObject;
 	import starling.display.Sprite;
 	import com.saia.starlingPunk.SPEntity;
 	/**
@@ -11,17 +12,21 @@ package com.saia.starlingPunk
 	public class SPWorld extends Sprite
 	{	
 		private var _allEntities:Dictionary;
+		private var allEntities:Vector.<SPEntity>;
 		private var _entityNames:Dictionary;
 		private var _addList:Vector.<SPEntity>;
 		private var _removeList:Vector.<SPEntity>;
 		private var _active:Boolean;
 		private var _disposeEntities:Boolean;
+		private var _layerList:Dictionary;
+		private var maxLayers:int = 10;
 		
 		public function SPWorld() 
 		{
 			//probably dictionary
-			_allEntities = new Dictionary();
 			_entityNames = new Dictionary();
+			_layerList = new Dictionary();
+			allEntities = new Vector.<SPEntity>();
 			
 			_addList = new Vector.<SPEntity>();
 			_removeList = new Vector.<SPEntity>();
@@ -66,7 +71,7 @@ package com.saia.starlingPunk
 		//----------
 		
 		/**
-		 * called my the main StarlinPunk engine ever frame, should not be overriden
+		 * called my the main StarlinPunk engine every frame, should not be overriden
 		 */
 		public function engineUpdate():void 
 		{
@@ -134,14 +139,8 @@ package com.saia.starlingPunk
 		 */
 		public function getAllEntities():Vector.<SPEntity>
 		{
-			var entity:SPEntity;
-			var allEntities:Vector.<SPEntity> = new Vector.<SPEntity>();
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
-			{
-				allEntities = allEntities.concat(entities);
-			}
-			
-			return allEntities;
+			var allEnts:Vector.<SPEntity> = allEntities;
+			return allEnts;
 		}
 		
 		/**
@@ -151,7 +150,19 @@ package com.saia.starlingPunk
 		*/
 		public function getType(type:String):Vector.<SPEntity>
 		{
-			return _allEntities[type];
+			//return _allEntities[type];
+			
+			var allObjects:Vector.<SPEntity> = allEntities;
+			var typeList:Vector.<SPEntity> = new Vector.<SPEntity>();
+			
+			for each (var ent:SPEntity in allObjects)
+			{
+				if (ent.type == type)
+				{
+					typeList.push(ent);
+				}
+			}
+			return typeList;
 		}
 		
 		/**
@@ -160,11 +171,12 @@ package com.saia.starlingPunk
 		 * @param the new type of the entity
 		*/
 		public function changeEntityTypeName(oldType:String, newType:String):void
-		{
+		{	
 			var group:Vector.<SPEntity> = getType(oldType);
 			delete _allEntities[oldType];
 			
 			var newGroup:Vector.<SPEntity> = getType(newType);
+			
 			if (!newGroup)
 			{
 				_allEntities[newType] = group;
@@ -182,14 +194,10 @@ package com.saia.starlingPunk
 		private function updateEntities():void 
 		{
 			var entity:SPEntity;
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
+			//for each (var entities:Vector.<SPEntity> in _allEntities)
+			for each (var entities:* in allEntities) 
 			{				
-				var numEntities:int = entities.length;
-				for (var i:int = 0; i < numEntities; i++) 
-				{
-					entity = entities[i];
-					entity.update();
-				}
+				entities.update();
 			}
 		}
 		
@@ -231,51 +239,17 @@ package com.saia.starlingPunk
 		
 		private function addEntityToLookUp(entity:SPEntity):void
 		{
-			var entityTypeArray:Vector.<SPEntity> = getType(entity.type);
-			if (entityTypeArray == null || entityTypeArray.length == 0) 
-			{
-				//create new array if doesn't exist
-				entityTypeArray = new Vector.<SPEntity>();
-			}
-			entityTypeArray.push(entity);
-			_allEntities[entity.type] = entityTypeArray;
+			
+			allEntities.push(entity);
+			trace(allEntities);
 		}
 		
 		private function removeFromObjectLookup(entity:SPEntity):void
 		{
-			var entityTypeArray:Vector.<SPEntity> = this.getType(entity.type);
-			var index:int = entityTypeArray.indexOf(entity);
-			entityTypeArray.splice(index, 1);
-			
-			if (entityTypeArray.length == 0) 
-			{
-				entityTypeArray = null;
-			}
+			var testIndex:int = allEntities.indexOf(entity);
+			allEntities.splice(testIndex, 1);
 		}
-		
-		/** @private	Registers the Entity's instance name */
-		internal function registerName(e:SPEntity):void
-		{
-			_entityNames[e._name] = e;
-		}
-		
-		/** @private	Unregisters the Entity's instance name */
-		internal function unregisterName(e:SPEntity):void
-		{
-			if (_entityNames[e._name] == e) { delete _entityNames[e._name]; }	
-		}
-		
-		/**
-		 * Returns the Entity with the instance name, or null if none exists.
-		 * @param	name	Instance name of the Entity.
-		 * @return	An Entity in this world.
-		 */
-		public function getInstance(name:String):*
-		{
-			return _entityNames[name];
-		}
-		
-		
+
 		//----------
 		//  abstract methods
 		//----------
