@@ -11,9 +11,8 @@ package com.saia.starlingPunk
 	 */
 	public class SPWorld extends Sprite
 	{	
-		private var _allEntities:Dictionary;
 		private var allEntities:Vector.<SPEntity>;
-		private var _entityNames:Dictionary;
+		private var _entityNames:Vector.<SPEntity>
 		private var _addList:Vector.<SPEntity>;
 		private var _removeList:Vector.<SPEntity>;
 		private var _active:Boolean;
@@ -24,7 +23,7 @@ package com.saia.starlingPunk
 		public function SPWorld() 
 		{
 			//probably dictionary
-			_entityNames = new Dictionary();
+			_entityNames = new Vector.<SPEntity>();
 			_layerList = new Dictionary();
 			allEntities = new Vector.<SPEntity>();
 			
@@ -122,7 +121,7 @@ package com.saia.starlingPunk
 		{
 			_disposeEntities = dispose;
 			var entity:SPEntity;
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
+			for each (var entities:* in allEntities) 
 			{
 				var numEntities:int = entities.length;
 				for (var i:int = 0; i < numEntities; i++) 
@@ -166,27 +165,28 @@ package com.saia.starlingPunk
 		}
 		
 		/**
-		 * this is called by the entity object when ever the type is changed. It will update the allEntites dictionary list
-		 * @param the old type of the entity
-		 * @param the new type of the entity
-		*/
-		public function changeEntityTypeName(oldType:String, newType:String):void
-		{	
-			var group:Vector.<SPEntity> = getType(oldType);
-			delete _allEntities[oldType];
+		 * Returns a Entity by it's unique name. In the case of multiple entities with same name, will grab last
+		 * added.
+		 * @param	entityName		The entity's name (set "eName" in the entity itself)
+		 * @return					The entity matching the specified name
+		 */
+		public function getInstance(entityName:String):SPEntity
+		{
+			var objList:Vector.<SPEntity> = allEntities;
+			var ent:SPEntity;
 			
-			var newGroup:Vector.<SPEntity> = getType(newType);
+			for each (var entity:SPEntity in objList)
+			{
+				if (entity.eName == entityName)
+				{
+					ent = entity;
+				}
+			}
 			
-			if (!newGroup)
-			{
-				_allEntities[newType] = group;
-			}
-			else
-			{
-				_allEntities[newType] = newGroup.concat(group);
-			}
+			return ent;
 		}
 		
+
 		//----------
 		//  private methods
 		//----------
@@ -239,9 +239,7 @@ package com.saia.starlingPunk
 		
 		private function addEntityToLookUp(entity:SPEntity):void
 		{
-			
 			allEntities.push(entity);
-			trace(allEntities);
 		}
 		
 		private function removeFromObjectLookup(entity:SPEntity):void
