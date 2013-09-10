@@ -186,7 +186,12 @@ package com.saia.starlingPunk
 			return ent;
 		}
 		
-
+		public function depthChanged(entity:SPEntity, oldLayer:int, newLayer:int):void
+		{
+			var oldLayerString:String = oldLayer.toString();
+			var newLayerString:String = newLayer.toString();
+		}
+		
 		//----------
 		//  private methods
 		//----------
@@ -208,10 +213,14 @@ package com.saia.starlingPunk
 			while (this._removeList.length) 
 			{
 				entity = _removeList[0];
+				
+				var entityLayerString:String = entity.layer.toString();
+				
 				entity.behaviorManager.removeAllBehaviors();
 				entity.removed();
 				entity.world = null;
-				removeChild(entity, _disposeEntities);
+				_layerList[entityLayerString].removeChild(entity, _disposeEntities);
+				//removeChild(entity, _disposeEntities);
 				removeFromObjectLookup(entity);
 				//removes items till none are left
 				_removeList.splice(0, 1);
@@ -227,10 +236,29 @@ package com.saia.starlingPunk
 				entity = _addList[0];
 				addEntityToLookUp(entity);
 				
-				var tempLayer:uint = entity.layer;
-				if (tempLayer > numChildren)
-					tempLayer = numChildren;
-				addChildAt(entity, tempLayer);
+				var entityLayerString:String = entity.layer.toString();
+				
+				if (_layerList[entityLayerString] == undefined)
+				{
+					_layerList[entityLayerString] = new SpriteLayer();
+					trace(_layerList[entityLayerString]);
+					
+					var tempLayer:uint = entity.layer;
+					if (tempLayer > numChildren)
+						tempLayer = numChildren;
+					
+					this.addChildAt(_layerList[entityLayerString], tempLayer);
+					_layerList[entityLayerString].addChild(entity);
+				}
+				else
+				{
+					_layerList[entityLayerString].addChild(entity);
+				}
+				
+				//var tempLayer:uint = entity.layer;
+				//if (tempLayer > numChildren)
+					//tempLayer = numChildren;
+				//addChildAt(entity, tempLayer);
 				entity.added();
 				//removes items till none are left
 				_addList.splice(0, 1);

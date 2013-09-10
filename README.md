@@ -1,5 +1,11 @@
-StarlingPunk
+﻿StarlingPunk
 ============
+
+##Branch Specific Stuff:
+* Reworked layering system - Layering should work more like FP now (no more having to set things to 110!)
+* SPSpritemap - A self contained class that juggles multiple movieClips for you. Acts like FP's Spritemap class but uses Texture Altases for better performance
+* You can now get Entities by instance (just set that object's eName). Getting entities by Class will be supported soon.
+* SPImage - Extremely basic at the moment, can only draw rectangles, circles and empty rectangles
 
 ###Update Version 1.5 Change Log
 * added mouseX, mouseY and mouseWheelDelta support to SPInput

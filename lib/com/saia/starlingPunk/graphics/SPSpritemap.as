@@ -22,6 +22,8 @@ package com.saia.starlingPunk.graphics
 		
 		private var errorTold:Boolean = false;
 		
+		private var nonLoopFuncComplete:Boolean = false;
+		
 		/**
 		 * Holds & controls multiple movieClips
 		 * @param	_atlas		The texture atlas
@@ -49,11 +51,25 @@ package com.saia.starlingPunk.graphics
 				
 					addChild(spritemapAnimations[currentAnimationState]);
 					Starling.juggler.add(spritemapAnimations[currentAnimationState]);
+					
+					nonLoopFuncComplete = false;
 				}
 				
 				if (spritemapAnimations[currentAnimationState].currentFrame == spritemapAnimations[currentAnimationState].numFrames - 1)
 				{
-					if (callback != null) { callback(); }
+					if (spritemapAnimations[currentAnimationState].loop == false)
+					{
+						if (!nonLoopFuncComplete)
+						{
+							if (callback != null) { callback(); }
+							nonLoopFuncComplete = true;
+						}
+					}
+					else 
+					{
+						if (callback != null) { callback(); }
+					}
+					
 				}
 			}
 			catch(err:TypeError)

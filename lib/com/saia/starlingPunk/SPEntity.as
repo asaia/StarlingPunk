@@ -26,6 +26,7 @@ package com.saia.starlingPunk
 		private var _x:Number;
 		private var _y:Number;
 		private var _behaviorManager:BehaviorManager;
+		public var eName:String;
 
 		
 		// Collision information.
@@ -39,6 +40,8 @@ package com.saia.starlingPunk
 			_originX = 0;
 			_originY = 0;
 			_collidable = true;
+			
+			eName = "default";
 			
 			this.x = x;
 			this.y = y;
@@ -75,8 +78,8 @@ package com.saia.starlingPunk
 		public function get type():String { return _type; }
 		public function set type(value:String):void 
 		{
-			if (world)
-				world.changeEntityTypeName(_type, value);
+			//if (world)
+				//world.changeEntityTypeName(_type, value);
 			_type = value;
 		}
 		
