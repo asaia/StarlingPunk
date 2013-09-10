@@ -1,7 +1,9 @@
 package com.saia.starlingPunk 
 {
 	import flash.utils.Dictionary;
+	import starling.display.DisplayObject;
 	import starling.display.Sprite;
+	import com.saia.starlingPunk.SPEntity;
 	/**
 	 * Updated by Engine, main game container that holds all currently active Entities.
 	 * Useful for organization, eg. "Menu", "Level1", etc.
@@ -9,16 +11,21 @@ package com.saia.starlingPunk
 	 */
 	public class SPWorld extends Sprite
 	{	
-		private var _allEntities:Dictionary;
+		private var allEntities:Vector.<SPEntity>;
+		private var _entityNames:Vector.<SPEntity>
 		private var _addList:Vector.<SPEntity>;
 		private var _removeList:Vector.<SPEntity>;
 		private var _active:Boolean;
 		private var _disposeEntities:Boolean;
+		private var _layerList:Dictionary;
+		private var maxLayers:int = 10;
 		
 		public function SPWorld() 
 		{
 			//probably dictionary
-			_allEntities = new Dictionary();
+			_entityNames = new Vector.<SPEntity>();
+			_layerList = new Dictionary();
+			allEntities = new Vector.<SPEntity>();
 			
 			_addList = new Vector.<SPEntity>();
 			_removeList = new Vector.<SPEntity>();
@@ -63,7 +70,7 @@ package com.saia.starlingPunk
 		//----------
 		
 		/**
-		 * called my the main StarlinPunk engine ever frame, should not be overriden
+		 * called my the main StarlinPunk engine every frame, should not be overriden
 		 */
 		public function engineUpdate():void 
 		{
@@ -114,7 +121,7 @@ package com.saia.starlingPunk
 		{
 			_disposeEntities = dispose;
 			var entity:SPEntity;
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
+			for each (var entities:* in allEntities) 
 			{
 				var numEntities:int = entities.length;
 				for (var i:int = 0; i < numEntities; i++) 
@@ -131,14 +138,8 @@ package com.saia.starlingPunk
 		 */
 		public function getAllEntities():Vector.<SPEntity>
 		{
-			var entity:SPEntity;
-			var allEntities:Vector.<SPEntity> = new Vector.<SPEntity>();
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
-			{
-				allEntities = allEntities.concat(entities);
-			}
-			
-			return allEntities;
+			var allEnts:Vector.<SPEntity> = allEntities;
+			return allEnts;
 		}
 		
 		/**
@@ -148,28 +149,47 @@ package com.saia.starlingPunk
 		*/
 		public function getType(type:String):Vector.<SPEntity>
 		{
-			return _allEntities[type];
+			//return _allEntities[type];
+			
+			var allObjects:Vector.<SPEntity> = allEntities;
+			var typeList:Vector.<SPEntity> = new Vector.<SPEntity>();
+			
+			for each (var ent:SPEntity in allObjects)
+			{
+				if (ent.type == type)
+				{
+					typeList.push(ent);
+				}
+			}
+			return typeList;
 		}
 		
 		/**
-		 * this is called by the entity object when ever the type is changed. It will update the allEntites dictionary list
-		 * @param the old type of the entity
-		 * @param the new type of the entity
-		*/
-		public function changeEntityTypeName(oldType:String, newType:String):void
+		 * Returns a Entity by it's unique name. In the case of multiple entities with same name, will grab last
+		 * added.
+		 * @param	entityName		The entity's name (set "eName" in the entity itself)
+		 * @return					The entity matching the specified name
+		 */
+		public function getInstance(entityName:String):SPEntity
 		{
-			var group:Vector.<SPEntity> = getType(oldType);
-			delete _allEntities[oldType];
+			var objList:Vector.<SPEntity> = allEntities;
+			var ent:SPEntity;
 			
-			var newGroup:Vector.<SPEntity> = getType(newType);
-			if (!newGroup)
+			for each (var entity:SPEntity in objList)
 			{
-				_allEntities[newType] = group;
+				if (entity.eName == entityName)
+				{
+					ent = entity;
+				}
 			}
-			else
-			{
-				_allEntities[newType] = newGroup.concat(group);
-			}
+			
+			return ent;
+		}
+		
+		public function depthChanged(entity:SPEntity, oldLayer:int, newLayer:int):void
+		{
+			var oldLayerString:String = oldLayer.toString();
+			var newLayerString:String = newLayer.toString();
 		}
 		
 		//----------
@@ -179,14 +199,10 @@ package com.saia.starlingPunk
 		private function updateEntities():void 
 		{
 			var entity:SPEntity;
-			for each (var entities:Vector.<SPEntity> in _allEntities) 
+			//for each (var entities:Vector.<SPEntity> in _allEntities)
+			for each (var entities:* in allEntities) 
 			{				
-				var numEntities:int = entities.length;
-				for (var i:int = 0; i < numEntities; i++) 
-				{
-					entity = entities[i];
-					entity.update();
-				}
+				entities.update();
 			}
 		}
 		
@@ -197,10 +213,14 @@ package com.saia.starlingPunk
 			while (this._removeList.length) 
 			{
 				entity = _removeList[0];
+				
+				var entityLayerString:String = entity.layer.toString();
+				
 				entity.behaviorManager.removeAllBehaviors();
 				entity.removed();
 				entity.world = null;
-				removeChild(entity, _disposeEntities);
+				_layerList[entityLayerString].removeChild(entity, _disposeEntities);
+				//removeChild(entity, _disposeEntities);
 				removeFromObjectLookup(entity);
 				//removes items till none are left
 				_removeList.splice(0, 1);
@@ -216,10 +236,29 @@ package com.saia.starlingPunk
 				entity = _addList[0];
 				addEntityToLookUp(entity);
 				
-				var tempLayer:uint = entity.layer;
-				if (tempLayer > numChildren)
-					tempLayer = numChildren;
-				addChildAt(entity, tempLayer);
+				var entityLayerString:String = entity.layer.toString();
+				
+				if (_layerList[entityLayerString] == undefined)
+				{
+					_layerList[entityLayerString] = new SpriteLayer();
+					trace(_layerList[entityLayerString]);
+					
+					var tempLayer:uint = entity.layer;
+					if (tempLayer > numChildren)
+						tempLayer = numChildren;
+					
+					this.addChildAt(_layerList[entityLayerString], tempLayer);
+					_layerList[entityLayerString].addChild(entity);
+				}
+				else
+				{
+					_layerList[entityLayerString].addChild(entity);
+				}
+				
+				//var tempLayer:uint = entity.layer;
+				//if (tempLayer > numChildren)
+					//tempLayer = numChildren;
+				//addChildAt(entity, tempLayer);
 				entity.added();
 				//removes items till none are left
 				_addList.splice(0, 1);
@@ -228,28 +267,15 @@ package com.saia.starlingPunk
 		
 		private function addEntityToLookUp(entity:SPEntity):void
 		{
-			var entityTypeArray:Vector.<SPEntity> = getType(entity.type);
-			if (entityTypeArray == null || entityTypeArray.length == 0) 
-			{
-				//create new array if doesn't exist
-				entityTypeArray = new Vector.<SPEntity>();
-			}
-			entityTypeArray.push(entity);
-			_allEntities[entity.type] = entityTypeArray;
+			allEntities.push(entity);
 		}
 		
 		private function removeFromObjectLookup(entity:SPEntity):void
 		{
-			var entityTypeArray:Vector.<SPEntity> = this.getType(entity.type);
-			var index:int = entityTypeArray.indexOf(entity);
-			entityTypeArray.splice(index, 1);
-			
-			if (entityTypeArray.length == 0) 
-			{
-				entityTypeArray = null;
-			}
+			var testIndex:int = allEntities.indexOf(entity);
+			allEntities.splice(testIndex, 1);
 		}
-		
+
 		//----------
 		//  abstract methods
 		//----------

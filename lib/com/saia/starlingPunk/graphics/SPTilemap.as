@@ -73,7 +73,7 @@
 			this.addEventListener(Event.REMOVED_FROM_STAGE, removed);
 			this.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			
-			this.blendMode = BlendMode.NONE;
+			this.blendMode = BlendMode.NORMAL;
 		}
 		
 		/**
@@ -105,7 +105,7 @@
 		 * @param	texture atlas containing tile images
 		 * @param   an array of the tile names found on the texture atlas
 		 */
-		public function createTilesFromTextureAtlas(data:TextureAtlas, tileNames:Array):void
+		public function createTilesFromTextureAtlas(data:TextureAtlas, tileNames:Vector.<String>):void
 		{
 			var numTiles:int = tileNames.length;
 			for (var i:int = 0; i < numTiles; i++) 
@@ -151,7 +151,7 @@
 			image.x = (column * _tileWidth) % SP.width;
 			image.y = (row * _tileHeight) % SP.height;
 			
-			image.blendMode = BlendMode.NONE;
+			image.blendMode = BlendMode.NORMAL;
 			sprite.addChild(image);
 			
 			if (refressSprite)

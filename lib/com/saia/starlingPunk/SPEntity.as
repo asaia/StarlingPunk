@@ -1,6 +1,8 @@
 package com.saia.starlingPunk 
 {
 	import com.saia.starlingPunk.behaviors.BehaviorManager;
+	import com.saia.starlingPunk.utils.Key;
+	import com.saia.starlingPunk.utils.SPInput;
 	import flash.geom.Point;
 	import flash.geom.Rectangle;
 	import flash.utils.getDefinitionByName;
@@ -21,7 +23,11 @@ package com.saia.starlingPunk
 		private var _layer:uint;
 		private var _originX:Number;
 		private var _originY:Number;
+		private var _x:Number;
+		private var _y:Number;
 		private var _behaviorManager:BehaviorManager;
+		public var eName:String;
+
 		
 		// Collision information.
 		private const HITBOX:SPMask = new SPMask;
@@ -34,6 +40,8 @@ package com.saia.starlingPunk
 			_originX = 0;
 			_originY = 0;
 			_collidable = true;
+			
+			eName = "default";
 			
 			this.x = x;
 			this.y = y;
@@ -70,8 +78,8 @@ package com.saia.starlingPunk
 		public function get type():String { return _type; }
 		public function set type(value:String):void 
 		{
-			if (world)
-				world.changeEntityTypeName(_type, value);
+			//if (world)
+				//world.changeEntityTypeName(_type, value);
 			_type = value;
 		}
 		
@@ -296,6 +304,37 @@ package com.saia.starlingPunk
 				bool = true;
 			}
 			return bool;
+		}
+		
+				/**
+		 * Checks if this Entity overlaps the specified position.
+		 * @param	x			Virtual x position to place this Entity.
+		 * @param	y			Virtual y position to place this Entity.
+		 * @param	pX			X position.
+		 * @param	pY			Y position.
+		 * @return	If the Entity intersects with the position.
+		 */
+		public function collidePoint(x:Number, y:Number, pX:Number, pY:Number):Boolean
+		{
+			if (pX >= x - originX && pY >= y - originY
+			&& pX < x - originX + width && pY < y - originY + height)
+			{
+				if (!_mask) return true;
+				_x = this.x; _y = this.y;
+				this.x = x; this.y = y;
+				SP.entity.x = pX;
+				SP.entity.y = pY;
+				SP.entity.width = 1;
+				SP.entity.height = 1;
+				if (_mask.collide(SP.entity.HITBOX))
+				{
+					this.x = _x; this.y = _y;
+					return true;
+				}
+				this.x = _x; this.y = _y;
+				return false;
+			}
+			return false;
 		}
 		
 		/**
