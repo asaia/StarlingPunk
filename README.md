@@ -1,12 +1,12 @@
 StarlingPunk
 ============
 
-###Update Version 1.5 Change Log
+### Update Version 1.5 Change Log
 * added mouseX, mouseY and mouseWheelDelta support to SPInput
 
 ----------------------------------------------------------------
 
-###Update Version 1.4 Change Log
+### Update Version 1.4 Change Log
 * added Starling's new AssetManager class to SP for easy access
 * updated to starling 1.3
 * added behavior system
@@ -15,7 +15,7 @@ StarlingPunk
 
 ----------------------------------------------------------------
 
-###Update Version 1.3 Change Log
+### Update Version 1.3 Change Log
  * created SPCamera class!!!!
  * added crazy experimental camera zoom and rotation abilities to platformer example
  * rebuilt SPTilesets to support massive amounts of tiles
@@ -26,7 +26,7 @@ StarlingPunk
 
 ----------------------------------------------------------------
 
-###Update Version 1.2 Change Log
+### Update Version 1.2 Change Log
  * fixed issues with entities hit box collision
  * hit box size wasn't being factored in by pixelMask
  * ported some more properties and methods for hit boxes from flashPunk
@@ -34,7 +34,7 @@ StarlingPunk
 
 ----------------------------------------------------------------
 
-###Update Version 1.1 Change Log
+### Update Version 1.1 Change Log
  * Tilemap support
  * Ogmo editor intergration
  * Collision Mask support
@@ -45,7 +45,7 @@ StarlingPunk
  * added collideTypes method to entity class
  * misc bug fixes/performance improvements
 
-###Future release plans:
+### Future release plans:
  * Port Camera class
  * Extension for box2D Physics Library
  * Component based behavior system sorta like Unity3D
@@ -57,7 +57,7 @@ http://andysaia.com/blog/starlingPunkTilemaps/starlingPunk-example.html
 
 ----------------------------------------------------------------
 
-###What is StarlingPunk:
+### What is StarlingPunk:
 
 StarlingPunk is a framework built on top the Starling library designed to add structure and organization to your 2D game projects. It’s perfect for rapidly prototyping ideas and promotes code reuse between projects.  As you may have been able to tell from the name, StarlingPunk is heavily inspired by the popular FlashPunk framework, although its not a direct port.
 
